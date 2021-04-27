@@ -2,7 +2,6 @@ package persistence
 
 import (
 	"context"
-	"fmt"
 
 	"danglingmind.com/ddd/v1/domain/entity"
 	"danglingmind.com/ddd/v1/domain/repository"
@@ -29,7 +28,7 @@ func (u *UserRepo) GetById(ctx context.Context, id uint64) (*entity.User, error)
 	}
 
 	user := &entity.User{}
-	err = row.Serialize(user)
+	err = row.Serialize2(user)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +45,6 @@ func (u *UserRepo) GetAll(ctx context.Context) ([]entity.User, error) {
 	for _, row := range rows {
 		user := entity.User{}
 		err = row.Serialize2(&user)
-		// err = mapstructure.Decode(row, &user)
-		fmt.Println(row)
 
 		if err != nil {
 			return nil, err

@@ -2,10 +2,13 @@ package interfaces
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"danglingmind.com/ddd/v1/application"
 	"danglingmind.com/ddd/v1/domain/entity"
+	"github.com/gorilla/mux"
 )
 
 // TODO: include auth and token layers as well
@@ -21,12 +24,22 @@ func NewUser(u application.UserAppInterface) *User {
 
 // Define all the handlers for your REST APIs
 func (u *User) GetUserById(w http.ResponseWriter, r *http.Request) {
-	user, err := u.us.GetById(r.Context(), 123) // TODO: fetch id from url
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err, "no user found")
+		Error(w, http.StatusInternalServerError, err, err.Error())
+		return
+	} else {
+		fmt.Println(id)
+		user, err := u.us.GetById(r.Context(), uint64(id))
+		if err != nil {
+			Error(w, http.StatusInternalServerError, err, err.Error())
+			return
+		}
+		JSON(w, http.StatusOK, user)
 		return
 	}
-	JSON(w, http.StatusOK, user)
+
 }
 
 func (u *User) GetAllUsers(w http.ResponseWriter, r *http.Request) {

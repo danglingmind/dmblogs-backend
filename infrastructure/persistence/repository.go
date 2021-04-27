@@ -15,7 +15,7 @@ type Row map[string]interface{}
 type Database interface {
 	Open(ctx context.Context, host, username, password, dbname string, port int) error
 	Close(ctx context.Context) error
-	QueryRow(ctx context.Context, q string, params ...interface{}) (Row, error)
+	QueryRow(ctx context.Context, q string, params interface{}) (Row, error)
 	Query(ctx context.Context, q string, params ...interface{}) ([]Row, error)
 	Save(ctx context.Context, q string, params ...interface{}) error
 }

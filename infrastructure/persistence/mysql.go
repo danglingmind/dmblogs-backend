@@ -3,7 +3,6 @@ package persistence
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -35,14 +34,12 @@ func (ms *MySqlStore) Close(ctx context.Context) error {
 	return ms.db.Close()
 }
 
-func (ms *MySqlStore) QueryRow(ctx context.Context, q string, params ...interface{}) (Row, error) {
-	res, err := ms.Query(ctx, q, params)
+func (ms *MySqlStore) QueryRow(ctx context.Context, q string, id interface{}) (Row, error) {
+	res, err := ms.Query(ctx, q, id)
 	if err != nil {
 		return nil, err
 	}
-	if len(res) != 1 {
-		return nil, errors.New("one row expected from query got many")
-	}
+
 	return res[0], nil
 }
 

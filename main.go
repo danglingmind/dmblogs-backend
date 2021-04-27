@@ -32,7 +32,7 @@ func main() {
 	// initialize paths
 	server := interfaces.NewServer()
 	server.AddRoute("GET", "/users", usersHandlers.GetAllUsers) // TODO: move this function conversion into Server.AddRoute
-	server.AddRoute("GET", "/user/:id", usersHandlers.GetUserById)
+	server.AddRoute("GET", "/user/{id:[0-9]+}", usersHandlers.GetUserById)
 	server.AddRoute("POST", "/user/save", usersHandlers.Save)
 
 	// Run the server
