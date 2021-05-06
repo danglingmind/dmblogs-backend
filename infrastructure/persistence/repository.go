@@ -96,6 +96,8 @@ func (qr Row) Serialize2(s interface{}) error {
 				valueToAssign := time.Time(v.Interface().(time.Time))
 				field.Set(reflect.ValueOf(valueToAssign))
 			}
+		} else {
+			return fmt.Errorf("not a struct")
 		}
 	}
 	return nil

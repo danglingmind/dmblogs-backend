@@ -14,6 +14,7 @@ type UserAppInterface interface {
 	GetById(context.Context, uint64) (*entity.User, error)
 	Save(context.Context, entity.User) error
 	Update(ctx context.Context, id uint64, values map[string]interface{}) error
+	GetByEmailPassword(ctx context.Context, us *entity.User) (*entity.User, error)
 }
 
 type UserApp struct {
@@ -37,4 +38,8 @@ func (u *UserApp) Save(ctx context.Context, user entity.User) error {
 
 func (u *UserApp) Update(ctx context.Context, id uint64, values map[string]interface{}) error {
 	return nil
+}
+
+func (u *UserApp) GetByEmailPassword(ctx context.Context, us *entity.User) (*entity.User, error) {
+	return u.user.GetByEmailPassword(ctx, us)
 }
