@@ -2,12 +2,13 @@
 package entity
 
 import (
-	"errors"
+	"fmt"
 	"html"
 	"strings"
 	"time"
 
 	"danglingmind.com/ddd/v1/infrastructure/security"
+	"github.com/badoux/checkmail"
 )
 
 type User struct {
@@ -45,14 +46,18 @@ func (u *User) PrepareToSave() (err error) {
 	return nil
 }
 
-func (u *User) LoginWithEmailPassword(email, password string) (bool, error) {
+func (u *User) Validate() (bool, error) {
 
-	if html.EscapeString(strings.TrimSpace(u.Email)) == u.Email {
-		err := security.VerifyPassword(u.Password, password)
-		if err != nil {
-			return false, errors.New("password didn't match")
-		}
-		return true, nil
+	if u.Password == "" {
+		return false, fmt.Errorf("password is required")
 	}
-	return false, errors.New("email not found")
+	if u.Email == "" {
+		return false, fmt.Errorf("email is required")
+	}
+	if u.Email != "" {
+		if err := checkmail.ValidateFormat(u.Email); err != nil {
+			return false, fmt.Errorf("please provide a valid email")
+		}
+	}
+	return true, nil
 }

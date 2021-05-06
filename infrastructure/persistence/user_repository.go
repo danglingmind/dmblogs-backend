@@ -81,3 +81,17 @@ func (u *UserRepo) Save(ctx context.Context, user entity.User) error {
 
 	return u.db.Save(ctx, insertStmt, args...)
 }
+
+func (u *UserRepo) GetByEmailPassword(ctx context.Context, us *entity.User) (*entity.User, error) {
+	user := entity.NewEmptyUser()
+
+	row, err := u.db.QueryRow(ctx, "select * from USERS where email = ?", us.Email)
+	if err != nil {
+		return nil, err
+	}
+	err = row.Serialize2(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
