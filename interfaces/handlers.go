@@ -1,12 +1,15 @@
 package interfaces
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -102,7 +105,33 @@ func (s *Server) AddRoute(method, route string, handler baseHandler, args ...int
 	}
 }
 
-func (s *Server) Run(port int) error {
+func (s *Server) Run(port int) {
 	fmt.Printf("\nStarting server at :%d\n", port)
-	return http.ListenAndServe(fmt.Sprintf(":%d", port), s.Router)
+	srv := &http.Server{
+		Addr:         fmt.Sprintf("0.0.0.0:%d", port),
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+		Handler:     s.Router ,
+	}
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Println(err)
+		}
+	}()
+
+	// take CTL+C to stop the server after a 2 minutes
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	<-c
+
+	// wait for 2 minutes to stop the server
+	var wait time.Duration = 2 * time.Minute
+	ctx, cancel := context.WithTimeout(context.Background(), wait)
+	defer cancel()
+
+	// graceful shutdown the server
+	srv.Shutdown(ctx)
+	log.Println("shutting down the server")
+	os.Exit(0)
 }
