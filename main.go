@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+	"os"
 	"strconv"
 
 	"danglingmind.com/ddd/v1/config"
@@ -64,5 +66,18 @@ func main() {
 	// loginRouter.HandleFunc("/refresh", authenticator.Refresh).Methods("POST")
 
 	// Run the server
-	server.Run(8000)
+
+	// get the PORT from the env variable because Heroku sets it dynamically
+
+	// err = os.Setenv("PORT", "8000")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	port := os.Getenv("PORT")
+	intPort, err := strconv.Atoi(port)
+	if err != nil {
+		log.Fatal("heroku port is not valid")
+	}
+	server.Run(intPort)
 }
