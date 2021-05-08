@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"danglingmind.com/ddd/v1/infrastructure/security"
+	"danglingmind.com/ddd/infrastructure/security"
 	"github.com/badoux/checkmail"
 )
 

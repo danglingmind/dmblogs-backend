@@ -3,8 +3,8 @@ package application
 import (
 	"context"
 
-	"danglingmind.com/ddd/v1/domain/entity"
-	"danglingmind.com/ddd/v1/domain/repository"
+	"danglingmind.com/ddd/domain/entity"
+	"danglingmind.com/ddd/domain/repository"
 )
 
 // this is the only api which is exposed to the interfaces to communicate with business elements

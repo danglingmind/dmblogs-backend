@@ -3,7 +3,7 @@ package persistence
 import (
 	"context"
 
-	"danglingmind.com/ddd/v1/domain/repository"
+	"danglingmind.com/ddd/domain/repository"
 )
 
 type Repositories struct {

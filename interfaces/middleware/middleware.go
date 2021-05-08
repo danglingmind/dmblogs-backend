@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"danglingmind.com/ddd/v1/infrastructure/auth"
-	"danglingmind.com/ddd/v1/interfaces"
+	"danglingmind.com/ddd/infrastructure/auth"
+	"danglingmind.com/ddd/interfaces"
 )
 
 func AuthMiddleware(next http.Handler) http.Handler {

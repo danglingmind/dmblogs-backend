@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"danglingmind.com/ddd/v1/domain/entity"
+	"danglingmind.com/ddd/domain/entity"
 )
 
 type UserRepository interface {

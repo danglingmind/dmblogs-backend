@@ -1,4 +1,4 @@
-module danglingmind.com/ddd/v1
+module danglingmind.com/ddd
 
 go 1.15
 

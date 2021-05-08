@@ -3,9 +3,9 @@ package persistence
 import (
 	"context"
 
-	"danglingmind.com/ddd/v1/domain/entity"
-	"danglingmind.com/ddd/v1/domain/repository"
-	"danglingmind.com/ddd/v1/utils"
+	"danglingmind.com/ddd/domain/entity"
+	"danglingmind.com/ddd/domain/repository"
+	"danglingmind.com/ddd/utils"
 )
 
 type UserRepo struct {
