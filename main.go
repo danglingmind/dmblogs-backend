@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 	"strconv"
 
@@ -10,6 +9,7 @@ import (
 	"danglingmind.com/ddd/v1/infrastructure/persistence"
 	"danglingmind.com/ddd/v1/interfaces"
 	"danglingmind.com/ddd/v1/interfaces/middleware"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -74,10 +74,8 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
+	godotenv.Load()
 	port := os.Getenv("PORT")
-	intPort, err := strconv.Atoi(port)
-	if err != nil {
-		log.Fatal("heroku port is not valid")
-	}
-	server.Run(intPort)
+
+	server.Run(port)
 }
