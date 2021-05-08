@@ -66,14 +66,6 @@ func main() {
 	// loginRouter.HandleFunc("/refresh", authenticator.Refresh).Methods("POST")
 
 	// Run the server
-
-	// get the PORT from the env variable because Heroku sets it dynamically
-
-	// err = os.Setenv("PORT", "8000")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
 	godotenv.Load()
 	port := os.Getenv("PORT")
 
