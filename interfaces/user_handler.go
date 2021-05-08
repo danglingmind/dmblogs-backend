@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"danglingmind.com/ddd/v1/application"
-	"danglingmind.com/ddd/v1/domain/entity"
+	"danglingmind.com/ddd/application"
+	"danglingmind.com/ddd/domain/entity"
 	"github.com/gorilla/mux"
 )
 

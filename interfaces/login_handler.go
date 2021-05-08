@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"danglingmind.com/ddd/v1/application"
-	"danglingmind.com/ddd/v1/domain/entity"
-	"danglingmind.com/ddd/v1/infrastructure/auth"
+	"danglingmind.com/ddd/application"
+	"danglingmind.com/ddd/domain/entity"
+	"danglingmind.com/ddd/infrastructure/auth"
 )
 
 type Authenticate struct {

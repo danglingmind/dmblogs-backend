@@ -4,11 +4,11 @@ import (
 	"os"
 	"strconv"
 
-	"danglingmind.com/ddd/v1/config"
-	"danglingmind.com/ddd/v1/infrastructure/auth"
-	"danglingmind.com/ddd/v1/infrastructure/persistence"
-	"danglingmind.com/ddd/v1/interfaces"
-	"danglingmind.com/ddd/v1/interfaces/middleware"
+	"danglingmind.com/ddd/config"
+	"danglingmind.com/ddd/infrastructure/auth"
+	"danglingmind.com/ddd/infrastructure/persistence"
+	"danglingmind.com/ddd/interfaces"
+	"danglingmind.com/ddd/interfaces/middleware"
 	"github.com/joho/godotenv"
 )
 
