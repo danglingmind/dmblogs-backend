@@ -105,14 +105,14 @@ func (s *Server) AddRoute(method, route string, handler baseHandler, args ...int
 	}
 }
 
-func (s *Server) Run(port int) {
-	fmt.Printf("\nStarting server at :%d\n", port)
+func (s *Server) Run(port string) {
+	fmt.Printf("\nStarting server at :%s\n", port)
 	srv := &http.Server{
-		Addr:         fmt.Sprintf("0.0.0.0:%d", port),
+		Addr:         fmt.Sprintf("%s:%s", "0.0.0.0", port),
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
-		Handler:     s.Router ,
+		Handler:      s.Router,
 	}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {

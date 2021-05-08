@@ -1,6 +1,8 @@
 # github.com/badoux/checkmail v1.2.1
 ## explicit
 github.com/badoux/checkmail
+# github.com/davecgh/go-spew v1.1.1
+## explicit
 # github.com/dgrijalva/jwt-go v3.2.0+incompatible
 ## explicit
 github.com/dgrijalva/jwt-go
@@ -19,9 +21,12 @@ github.com/go-sql-driver/mysql
 # github.com/gorilla/mux v1.8.0
 ## explicit
 github.com/gorilla/mux
-# github.com/mitchellh/mapstructure v1.4.1
+# github.com/joho/godotenv v1.3.0
 ## explicit
-# github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
+github.com/joho/godotenv
+# github.com/myesui/uuid v1.0.0
+## explicit
+# github.com/pmezard/go-difflib v1.0.0
 ## explicit
 # github.com/twinj/uuid v1.0.0
 ## explicit
@@ -30,3 +35,5 @@ github.com/twinj/uuid
 ## explicit
 golang.org/x/crypto/bcrypt
 golang.org/x/crypto/blowfish
+# gopkg.in/stretchr/testify.v1 v1.2.2
+## explicit
