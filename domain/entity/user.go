@@ -12,16 +12,17 @@ import (
 )
 
 type User struct {
-	ID         int       `json:"id" type:"int"`
-	Firstname  string    `json:"firstname" type:"string"`
-	Middlename string    `json:"middlename" type:"string"`
-	Lastname   string    `json:"lastname" type:"string"`
-	Mobile     string    `json:"mobile" type:"string"`
-	Email      string    `json:"email" type:"string"`
-	Password   string    `json:"password" type:"string"`
-	Created    time.Time `json:"created" type:"time"`
-	Modified   time.Time `json:"modified" type:"time"`
-	Active     bool      `json:"active" type:"bool"`
+	ID          int       `json:"id" type:"int"`
+	Firstname   string    `json:"firstname" type:"string"`
+	Middlename  string    `json:"middlename" type:"string"`
+	Lastname    string    `json:"lastname" type:"string"`
+	Countrycode string    `json:"countrycode" type:"string"`
+	Mobile      string    `json:"mobile" type:"string"`
+	Email       string    `json:"email" type:"string"`
+	Password    string    `json:"password" type:"string"`
+	Created     time.Time `json:"created" type:"time"`
+	Modified    time.Time `json:"modified" type:"time"`
+	Active      bool      `json:"active" type:"bool"`
 }
 
 func NewEmptyUser() User {
