@@ -18,8 +18,8 @@ func NewRepositories(Dbdriver, DbUser, DbPassword, DbPort, DbHost, DbName string
 	DBURL := os.Getenv("DATABASE_URL")
 	if DBURL == "" {
 		DBURL = fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", DbHost, DbPort, DbUser, DbName, DbPassword)
-
 	}
+
 	db, err := gorm.Open(Dbdriver, DBURL)
 	if err != nil {
 		return nil, err

@@ -18,8 +18,6 @@ github.com/go-redis/redis/v7/internal/util
 # github.com/go-sql-driver/mysql v1.6.0
 ## explicit
 # github.com/gomodule/redigo v1.8.4
-## explicit
-github.com/gomodule/redigo/redis
 # github.com/gorilla/mux v1.8.0
 ## explicit
 github.com/gorilla/mux
