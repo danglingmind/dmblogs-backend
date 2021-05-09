@@ -1,97 +1,80 @@
 package persistence
 
 import (
-	"context"
+	"errors"
+	"fmt"
+	"strings"
 
 	"danglingmind.com/ddd/domain/entity"
 	"danglingmind.com/ddd/domain/repository"
-	"danglingmind.com/ddd/utils"
+	"danglingmind.com/ddd/infrastructure/security"
+	"github.com/jinzhu/gorm"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepo struct {
-	db Database
+	db *gorm.DB
 }
 
 // UserRepo implements user repository
 var _ repository.UserRepository = &UserRepo{}
 
-func NewUserRepository(db Database) *UserRepo {
+func NewUserRepository(db *gorm.DB) *UserRepo {
 	return &UserRepo{
 		db: db,
 	}
 }
 
-func (u *UserRepo) GetById(ctx context.Context, id uint64) (*entity.User, error) {
-	row, err := u.db.QueryRow(ctx, "select * from USERS where id=?", id)
+func (u *UserRepo) GetById(id uint64) (*entity.User, error) {
+	var user entity.User
+	err := u.db.Debug().Where("id = ?", id).Take(&user).Error
 	if err != nil {
 		return nil, err
 	}
-
-	user := &entity.User{}
-	err = row.Serialize2(user)
-	if err != nil {
-		return nil, err
+	if gorm.IsRecordNotFoundError(err) {
+		return nil, errors.New("user not found")
 	}
-	return user, nil
+	return &user, nil
 }
 
-func (u *UserRepo) GetAll(ctx context.Context) ([]entity.User, error) {
-	rows, err := u.db.Query(ctx, "select * from USERS")
+func (u *UserRepo) GetAll() ([]entity.User, error) {
+	var users []entity.User
+	err := u.db.Debug().Find(&users).Error
 	if err != nil {
 		return nil, err
 	}
-
-	users := make([]entity.User, 0)
-	for _, row := range rows {
-		user := entity.User{}
-		err = row.Serialize2(&user)
-
-		if err != nil {
-			return nil, err
-		}
-		users = append(users, user)
+	if gorm.IsRecordNotFoundError(err) {
+		return nil, errors.New("user not found")
 	}
 	return users, nil
 }
 
-func (u *UserRepo) Update(ctx context.Context, id uint64, values map[string]interface{}) error {
-	return nil
-}
-
-// TODO: use string builder here
-func (u *UserRepo) Save(ctx context.Context, user entity.User) error {
-	// senitize user struct
-	user.PrepareToSave()
-	fieldsMap := utils.GetJsonTagsWithValues2(user)
-	args := make([]interface{}, 0)
-	fieldNameString := ""
-	fieldNamePlaceholder := ""
-	i := 0
-	for fieldJsonName, fieldValue := range fieldsMap {
-		i++
-		args = append(args, fieldValue)
-		fieldNameString = fieldNameString + fieldJsonName
-		fieldNamePlaceholder = fieldNamePlaceholder + "?"
-		if i < len(fieldsMap) {
-			fieldNameString = fieldNameString + ","
-			fieldNamePlaceholder = fieldNamePlaceholder + ","
+func (u *UserRepo) Save(user *entity.User) (*entity.User, error) {
+	err := u.db.Debug().Create(&user).Error
+	if err != nil {
+		//If the email is already taken
+		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "Duplicate") {
+			return nil, fmt.Errorf("email already taken")
 		}
+		//any other db error
+		return nil, fmt.Errorf("database error")
 	}
-	insertStmt := "insert into USERS (" + fieldNameString + ") values (" + fieldNamePlaceholder + ")"
-
-	return u.db.Save(ctx, insertStmt, args...)
+	return user, nil
 }
 
-func (u *UserRepo) GetByEmailPassword(ctx context.Context, us *entity.User) (*entity.User, error) {
-	user := entity.NewEmptyUser()
-
-	row, err := u.db.QueryRow(ctx, "select * from USERS where email = ?", us.Email)
+func (u *UserRepo) GetByEmailPassword(us *entity.User) (*entity.User, error) {
+	var user entity.User
+	err := u.db.Debug().Where("email = ?", us.Email).Take(&user).Error
+	if gorm.IsRecordNotFoundError(err) {
+		return nil, err
+	}
 	if err != nil {
 		return nil, err
 	}
-	err = row.Serialize2(&user)
-	if err != nil {
-		return nil, err
+	//Verify the password
+	err = security.VerifyPassword(user.Password, us.Password)
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+		return nil, fmt.Errorf("incorrect password")
 	}
 	return &user, nil
 }

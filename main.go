@@ -2,9 +2,7 @@ package main
 
 import (
 	"os"
-	"strconv"
 
-	"danglingmind.com/ddd/config"
 	"danglingmind.com/ddd/infrastructure/auth"
 	"danglingmind.com/ddd/infrastructure/persistence"
 	"danglingmind.com/ddd/interfaces"
@@ -15,27 +13,30 @@ import (
 func main() {
 
 	// initialize configurations
-	// conf := config.LoadConfig()
-	mySqlDbname, _ := config.GetValue("mysql_db")
-	mySqlUser, _ := config.GetValue("mysql_user")
-	mySqlPass, _ := config.GetValue("mysql_password")
-	mySqlPort, _ := config.GetValue("mysql_port")
-	mySqlPortInt, _ := strconv.Atoi(mySqlPort)
-	mySqlHost, _ := config.GetValue("mysql_host")
-	redisHost, _ := config.GetValue("redis_host")
-	redisPort, _ := config.GetValue("redis_port")
-	redisPass, _ := config.GetValue("redis_password")
+	godotenv.Load()
+	// db config
+	dbdriver := os.Getenv("DB_DRIVER")
+	host := os.Getenv("DB_HOST")
+	password := os.Getenv("DB_PASSWORD")
+	user := os.Getenv("DB_USER")
+	dbname := os.Getenv("DB_NAME")
+	dbport := os.Getenv("DB_PORT")
+
+	// redis config
+	redis_host := os.Getenv("REDIS_HOST")
+	redis_port := os.Getenv("REDIS_PORT")
+	redis_password := os.Getenv("REDIS_PASSWORD")
 
 	// infrastructure layer instance
 	// create domain repositories to deal with databases
-	services, err := persistence.NewRepository(mySqlHost, mySqlUser, mySqlPass, mySqlDbname, mySqlPortInt)
+	services, err := persistence.NewRepositories(dbdriver, user, password, dbport, host, dbname)
 	if err != nil {
 		panic(err.Error())
 	}
 
 	// interface layer instance
 	// create interfaces (adapters) of each interaction point to the app
-	rd, err := auth.NewRedisDB(redisHost, redisPort, redisPass)
+	rd, err := auth.NewRedisDB(redis_host, redis_port, redis_password)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -66,7 +67,6 @@ func main() {
 	// loginRouter.HandleFunc("/refresh", authenticator.Refresh).Methods("POST")
 
 	// Run the server
-	godotenv.Load()
 	port := os.Getenv("PORT")
 
 	server.Run(port)
