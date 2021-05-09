@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/go-redis/redis/v7"
+	"github.com/gomodule/redigo/redis"
 )
 
 type AuthInterface interface {
@@ -17,12 +17,12 @@ type AuthInterface interface {
 }
 
 type ClientData struct {
-	client *redis.Client
+	client redis.Conn
 }
 
 var _ AuthInterface = &ClientData{}
 
-func NewAuth(client *redis.Client) *ClientData {
+func NewAuth(client redis.Conn) *ClientData {
 	return &ClientData{client: client}
 }
 
@@ -46,14 +46,24 @@ func (tk *ClientData) CreateAuth(userid uint64, td *TokenDetails) error {
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
 
-	atCreated, err := tk.client.Set(td.TokenUuid, strconv.Itoa(int(userid)), at.Sub(now)).Result()
+	atCreated, err := tk.client.Do("SET", td.TokenUuid, strconv.Itoa(int(userid)))
 	if err != nil {
 		return err
 	}
-	rtCreated, err := tk.client.Set(td.RefreshUuid, strconv.Itoa(int(userid)), rt.Sub(now)).Result()
+	_, err = tk.client.Do("EXPIRE", td.TokenUuid, int(at.Sub(now).Seconds()))
 	if err != nil {
 		return err
 	}
+
+	rtCreated, err := tk.client.Do("SET", td.RefreshUuid, strconv.Itoa(int(userid)))
+	if err != nil {
+		return err
+	}
+	_, err = tk.client.Do("EXPIRE", td.RefreshUuid, int(rt.Sub(now).Seconds()))
+	if err != nil {
+		return err
+	}
+
 	if atCreated == "0" || rtCreated == "0" {
 		return errors.New("no record inserted")
 	}
@@ -62,12 +72,11 @@ func (tk *ClientData) CreateAuth(userid uint64, td *TokenDetails) error {
 
 //Check the metadata saved
 func (tk *ClientData) FetchAuth(tokenUuid string) (uint64, error) {
-	userid, err := tk.client.Get(tokenUuid).Result()
+	userid, err := redis.Uint64(tk.client.Do("GET", tokenUuid))
 	if err != nil {
 		return 0, err
 	}
-	userID, _ := strconv.ParseUint(userid, 10, 64)
-	return userID, nil
+	return userid, nil
 }
 
 //Once a user row in the token table
@@ -75,12 +84,12 @@ func (tk *ClientData) DeleteTokens(authD *AccessDetails) error {
 	//get the refresh uuid
 	refreshUuid := fmt.Sprintf("%s++%d", authD.TokenUuid, authD.UserId)
 	//delete access token
-	deletedAt, err := tk.client.Del(authD.TokenUuid).Result()
+	deletedAt, err := tk.client.Do("DEL", authD.TokenUuid)
 	if err != nil {
 		return err
 	}
 	//delete refresh token
-	deletedRt, err := tk.client.Del(refreshUuid).Result()
+	deletedRt, err := tk.client.Do("DEL", refreshUuid)
 	if err != nil {
 		return err
 	}
@@ -93,7 +102,8 @@ func (tk *ClientData) DeleteTokens(authD *AccessDetails) error {
 
 func (tk *ClientData) DeleteRefresh(refreshUuid string) error {
 	//delete refresh token
-	deleted, err := tk.client.Del(refreshUuid).Result()
+
+	deleted, err := tk.client.Do("DEL", refreshUuid)
 	if err != nil || deleted == 0 {
 		return err
 	}
