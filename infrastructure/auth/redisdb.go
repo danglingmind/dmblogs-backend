@@ -1,18 +1,26 @@
 package auth
 
-import "github.com/go-redis/redis/v7"
+import (
+	"github.com/gomodule/redigo/redis"
+)
 
 type RedisService struct {
 	Auth   AuthInterface
-	Client *redis.Client
+	Client redis.Conn
 }
 
-func NewRedisDB(host, port, password string) (*RedisService, error) {
-	redisClient := redis.NewClient(&redis.Options{
-		Addr:     host + ":" + port,
-		Password: password,
-		DB:       0,
-	})
+func NewRedisDB(redis_url string) (*RedisService, error) {
+	var redisClient redis.Conn
+	var err error
+	if redis_url == "" {
+		redisClient, err = redis.Dial("tcp", ":6379")
+	} else {
+		redisClient, err = redis.DialURL(redis_url)
+	}
+	if err != nil {
+		return nil, err
+	}
+
 	return &RedisService{
 		Auth:   NewAuth(redisClient),
 		Client: redisClient,

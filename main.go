@@ -23,9 +23,11 @@ func main() {
 	dbport := os.Getenv("DB_PORT")
 
 	// redis config
-	redis_host := os.Getenv("REDIS_HOST")
-	redis_port := os.Getenv("REDIS_PORT")
-	redis_password := os.Getenv("REDIS_PASSWORD")
+	redis_url := os.Getenv("REDISTOGO_URL")
+	// redis_host := os.Getenv("REDIS_HOST")
+	// redis_port := os.Getenv("REDIS_PORT")
+	// redis_password := os.Getenv("REDIS_PASSWORD")
+
 
 	// infrastructure layer instance
 	// create domain repositories to deal with databases
@@ -36,7 +38,8 @@ func main() {
 
 	// interface layer instance
 	// create interfaces (adapters) of each interaction point to the app
-	rd, err := auth.NewRedisDB(redis_host, redis_port, redis_password)
+	rd, err := auth.NewRedisDB(redis_url)
+
 	if err != nil {
 		panic(err.Error())
 	}

@@ -17,6 +17,7 @@ github.com/go-redis/redis/v7/internal/proto
 github.com/go-redis/redis/v7/internal/util
 # github.com/go-sql-driver/mysql v1.6.0
 ## explicit
+# github.com/gomodule/redigo v1.8.4
 # github.com/gorilla/mux v1.8.0
 ## explicit
 github.com/gorilla/mux
@@ -35,8 +36,6 @@ github.com/lib/pq/hstore
 github.com/lib/pq/oid
 github.com/lib/pq/scram
 # github.com/myesui/uuid v1.0.0
-## explicit
-# github.com/pmezard/go-difflib v1.0.0
 ## explicit
 # github.com/twinj/uuid v1.0.0
 ## explicit
