@@ -19,7 +19,8 @@ func NewRedisDB(redis_url string) (*RedisService, error) {
 	// } else {
 	// 	redisClient, err = redis.DialURL(redis_url)
 	// }
-	redisClient, err = redis.DialURL(redis_url)
+	log.Printf("func: NewRedisDB  redis_url: %s", redis_url)
+	redisClient, err = redis.DialURL(redis_url, redis.DialPassword("487331a69ff8cd65996d9e5d6728218e"))
 	if err != nil {
 		log.Fatalf("func: NewRedisDB error: %s", err.Error())
 		return nil, err
