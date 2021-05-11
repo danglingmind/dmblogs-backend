@@ -24,10 +24,6 @@ func main() {
 
 	// redis config
 	redis_url := os.Getenv("REDISTOGO_URL")
-	// redis_host := os.Getenv("REDIS_HOST")
-	// redis_port := os.Getenv("REDIS_PORT")
-	// redis_password := os.Getenv("REDIS_PASSWORD")
-
 
 	// infrastructure layer instance
 	// create domain repositories to deal with databases

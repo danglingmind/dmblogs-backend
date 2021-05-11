@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"log"
+
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -18,6 +20,7 @@ func NewRedisDB(redis_url string) (*RedisService, error) {
 		redisClient, err = redis.DialURL(redis_url)
 	}
 	if err != nil {
+		log.Fatalln(err)
 		return nil, err
 	}
 
