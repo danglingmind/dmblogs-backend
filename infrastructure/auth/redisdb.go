@@ -14,13 +14,14 @@ type RedisService struct {
 func NewRedisDB(redis_url string) (*RedisService, error) {
 	var redisClient redis.Conn
 	var err error
-	if redis_url == "" {
-		redisClient, err = redis.Dial("tcp", ":6379")
-	} else {
-		redisClient, err = redis.DialURL(redis_url)
-	}
+	// if redis_url == "" {
+	// 	redisClient, err = redis.Dial("tcp", ":6379")
+	// } else {
+	// 	redisClient, err = redis.DialURL(redis_url)
+	// }
+	redisClient, err = redis.DialURL(redis_url)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("func: NewRedisDB error: %s", err.Error())
 		return nil, err
 	}
 
