@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"danglingmind.com/ddd/application"
@@ -52,6 +53,7 @@ func (au *Authenticate) Login(w http.ResponseWriter, r *http.Request) {
 
 	err = au.authInterface.CreateAuth(uint64(user.ID), tk)
 	if err != nil {
+		log.Printf("ERR: error while storing the token")
 		Error(w, http.StatusInternalServerError, err, err.Error())
 		return
 	}
