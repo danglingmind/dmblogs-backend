@@ -39,7 +39,7 @@ func (au *Authenticate) Login(w http.ResponseWriter, r *http.Request) {
 	// validate credentials
 	user, err := au.userApp.GetByEmailPassword(&u)
 	if err != nil {
-		Error(w, http.StatusUnauthorized, err, err.Error())
+		Error(w, http.StatusForbidden, err, err.Error())
 		return
 	}
 

@@ -50,11 +50,15 @@ func (u *UserRepo) GetAll() ([]entity.User, error) {
 }
 
 func (u *UserRepo) Save(user *entity.User) (*entity.User, error) {
-	err := u.db.Debug().Create(&user).Error
+	err := user.PrepareToSave()
+	if err != nil {
+		return nil, err
+	}
+	err = u.db.Debug().Create(&user).Error
 	if err != nil {
 		//If the email is already taken
 		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "Duplicate") {
-			return nil, fmt.Errorf("email already taken")
+			return nil, fmt.Errorf("email or mobile already taken")
 		}
 		//any other db error
 		return nil, fmt.Errorf("database error")
