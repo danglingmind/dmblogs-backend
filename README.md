@@ -2,6 +2,11 @@
 
 ![ddd layers diagram image](./ddd-arch-diag.jpeg)
 
+## Building application 
+Use the `build.sh` executable to bring docker instances for the application and its dependencies with docker-compose.
+```
+./build.sh
+```
 
 ## Layers Implementation Description
 
