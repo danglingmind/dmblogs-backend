@@ -11,6 +11,7 @@ import (
 
 type Repositories struct {
 	User repository.UserRepository
+	Blog repository.BlogRepository
 	db   *gorm.DB
 }
 
@@ -28,6 +29,7 @@ func NewRepositories(Dbdriver, DbUser, DbPassword, DbPort, DbHost, DbName string
 
 	return &Repositories{
 		User: NewUserRepository(db),
+		Blog: NewBlogRepository(db),
 		db:   db,
 	}, nil
 }

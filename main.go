@@ -65,6 +65,27 @@ func main() {
 	loginRouter.HandleFunc("/logout", authenticator.Logout).Methods("POST")
 	// loginRouter.HandleFunc("/refresh", authenticator.Refresh).Methods("POST")
 
+	// Blog endpoints
+	loginRouter.Path("/blog/save").
+		Methods("POST").
+		HandlerFunc(blogsHandlers.Save).
+		Name("SaveBlog")
+
+	loginRouter.Path("/blog/{id:[0-9]+}").
+		Methods("GET").
+		HandlerFunc(blogsHandlers.GetBlogById).
+		Name("GetBlogById")
+
+	loginRouter.Path("/blogs/{tag}").
+		Queries("limit", "{limit}", "offset", "{offset}").
+		HandlerFunc(blogsHandlers.GetBlogsByTag).
+		Name("BlogsByTag")
+
+	loginRouter.Path("/blogs").
+		Queries("limit", "{limit}", "offset", "{offset}").
+		HandlerFunc(blogsHandlers.GetBlogs).
+		Name("BlogsPage")
+
 	// Run the server
 	port := os.Getenv("PORT")
 
