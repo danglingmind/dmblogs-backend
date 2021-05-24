@@ -1,0 +1,45 @@
+version: '3'
+services: 
+    postgres:
+        build: 
+            context: .
+            dockerfile: Dockerfile.postgres
+        container_name: postgres
+        ports:
+            - 5432:5432
+        volumes: 
+            - db-data:/var/lib/postres/data
+        networks: 
+            - overlay
+
+    redis:
+        image: redis
+        container_name: redis
+        ports: 
+            - 6379:6379
+        networks: 
+            - overlay
+        restart: always
+
+    backend:
+        build: 
+            context: .
+            dockerfile: Dockerfile 
+        container_name: dbblogs-backend
+        ports:
+            - "8000:8000"
+        environment: 
+            - GREETING="hello world"
+        env_file: .env
+        networks: 
+            - overlay
+        depends_on: 
+            - redis 
+            - postgres
+
+volumes:
+    db-data:
+        external: false
+
+networks:
+    overlay:
