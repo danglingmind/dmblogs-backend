@@ -78,7 +78,7 @@ func (u *UserRepo) GetByEmailPassword(us *entity.User) (*entity.User, error) {
 	//Verify the password
 	err = security.VerifyPassword(user.Password, us.Password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return nil, fmt.Errorf("incorrect password")
+		return nil, err
 	}
 	return &user, nil
 }

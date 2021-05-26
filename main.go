@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"danglingmind.com/ddd/domain/service"
 	"danglingmind.com/ddd/infrastructure/auth"
 	"danglingmind.com/ddd/infrastructure/persistence"
 	"danglingmind.com/ddd/interfaces"
@@ -23,68 +24,83 @@ func main() {
 	dbport := os.Getenv("DB_PORT")
 
 	// redis config
-	redis_url := os.Getenv("REDISTOGO_URL")
+	redisHost := os.Getenv("REDIS_HOST")
 
-	// infrastructure layer instance
 	// create domain repositories to deal with databases
 	services, err := persistence.NewRepositories(dbdriver, user, password, dbport, host, dbname)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	// interface layer instance
 	// create interfaces (adapters) of each interaction point to the app
-	rd, err := auth.NewRedisDB(redis_url)
-
+	rd, err := auth.NewRedisDB(redisHost)
 	if err != nil {
 		panic(err.Error())
 	}
 
 	au := auth.NewAuth(rd.Client)
 	tk := auth.NewToken()
+	buServices := service.NewTagService(services.Tag, services.BlogTag)
 	usersHandlers := interfaces.NewUser(services.User)
 	authenticator := interfaces.NewAuthenticator(services.User, au, tk)
+	blogHandlers := interfaces.NewBlog(
+		services.Blog,
+		services.User,
+		services.Tag,
+		services.BlogTag,
+		buServices,
+		tk,
+		au,
+	)
 
 	// Initialize server
 	server := interfaces.NewServer()
 	// CORS middleware
 	server.Router.Use(middleware.CORSMiddleware)
 
-	// user service
-	server.AddRoute("GET", "/users", usersHandlers.GetAllUsers)
-	server.AddRoute("GET", "/user/{id:[0-9]+}", usersHandlers.GetUserById)
-	server.AddRoute("POST", "/user/save", usersHandlers.Save)
-
-	// login service
+	// login service endpoints
+	server.AddRoute("PUT", "/register", authenticator.Register)
 	server.AddRoute("POST", "/login", authenticator.Login)
 
-	loginRouter := server.Router.PathPrefix("/auth/").Subrouter()
 	// add authentication to login routes
-	loginRouter.Use(middleware.AuthMiddleware)
-	// loginRouter.HandleFunc("/login", authenticator.Login).Methods("POST")
-	loginRouter.HandleFunc("/logout", authenticator.Logout).Methods("POST")
-	// loginRouter.HandleFunc("/refresh", authenticator.Refresh).Methods("POST")
+	authenticatedRouter := server.Router.PathPrefix("/auth/").Subrouter()
+	authenticatedRouter.Use(middleware.AuthMiddleware)
 
-	// Blog endpoints
-	loginRouter.Path("/blog/save").
-		Methods("POST").
-		HandlerFunc(blogsHandlers.Save).
+	authenticatedRouter.HandleFunc("/logout", authenticator.Logout).Methods("POST")
+	// authenticatedRouter.HandleFunc("/refresh", authenticator.Refresh).Methods("POST")
+
+	// user service endpoints
+	server.AddRoute("GET", "/users", usersHandlers.GetAllUsers)
+	server.AddRoute("GET", "/users/{id:[0-9]+}", usersHandlers.GetUserById)
+
+	// blogs endpoints
+	authenticatedRouter.
+		Path("/blogs/save").
+		Methods("PUT").
+		HandlerFunc(blogHandlers.Save).
 		Name("SaveBlog")
 
-	loginRouter.Path("/blog/{id:[0-9]+}").
+	authenticatedRouter.
+		Path("/blogs/{id:[0-9]+}").
 		Methods("GET").
-		HandlerFunc(blogsHandlers.GetBlogById).
+		HandlerFunc(blogHandlers.GetBlogById).
 		Name("GetBlogById")
 
-	loginRouter.Path("/blogs/{tag}").
-		Queries("limit", "{limit}", "offset", "{offset}").
-		HandlerFunc(blogsHandlers.GetBlogsByTag).
+	// support limit and offset query params
+	authenticatedRouter.
+		Path("/blogs/tag/{tagid:[0-9]+}").
+		Methods("GET").
+		HandlerFunc(blogHandlers.GetBlogsByTagName).
 		Name("BlogsByTag")
 
-	loginRouter.Path("/blogs").
-		Queries("limit", "{limit}", "offset", "{offset}").
-		HandlerFunc(blogsHandlers.GetBlogs).
+	// support limit and offset query params
+	authenticatedRouter.
+		Path("/blogs").
+		Methods("GET").
+		HandlerFunc(blogHandlers.GetBlogs).
 		Name("BlogsPage")
+
+	// tag service endpoints
 
 	// Run the server
 	port := os.Getenv("PORT")

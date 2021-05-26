@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -37,7 +36,7 @@ func (tk *ClientData) CreateAuth(userid uint64, td *TokenDetails) error {
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
 
-	atCreated, err := tk.client.Do("SET", td.TokenUuid, strconv.Itoa(int(userid)))
+	_, err := tk.client.Do("SET", td.TokenUuid, strconv.Itoa(int(userid)))
 	if err != nil {
 		return err
 	}
@@ -46,17 +45,13 @@ func (tk *ClientData) CreateAuth(userid uint64, td *TokenDetails) error {
 		return err
 	}
 
-	rtCreated, err := tk.client.Do("SET", td.RefreshUuid, strconv.Itoa(int(userid)))
+	_, err = tk.client.Do("SET", td.RefreshUuid, strconv.Itoa(int(userid)))
 	if err != nil {
 		return err
 	}
 	_, err = tk.client.Do("EXPIRE", td.RefreshUuid, int(rt.Sub(now).Seconds()))
 	if err != nil {
 		return err
-	}
-
-	if atCreated == "0" || rtCreated == "0" {
-		return errors.New("no record inserted")
 	}
 	return nil
 }
@@ -75,19 +70,16 @@ func (tk *ClientData) DeleteTokens(authD *AccessDetails) error {
 	//get the refresh uuid
 	refreshUuid := fmt.Sprintf("%s++%d", authD.TokenUuid, authD.UserId)
 	//delete access token
-	deletedAt, err := tk.client.Do("DEL", authD.TokenUuid)
+	_, err := tk.client.Do("DEL", authD.TokenUuid)
 	if err != nil {
 		return err
 	}
 	//delete refresh token
-	deletedRt, err := tk.client.Do("DEL", refreshUuid)
+	_, err = tk.client.Do("DEL", refreshUuid)
 	if err != nil {
 		return err
 	}
-	//When the record is deleted, the return value is 1
-	if deletedAt != 1 || deletedRt != 1 {
-		return errors.New("something went wrong")
-	}
+
 	return nil
 }
 
