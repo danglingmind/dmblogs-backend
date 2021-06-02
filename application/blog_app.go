@@ -11,6 +11,7 @@ type BlogAppInterface interface {
 	GetBlogById(id uint64) (*entity.Blog, error)
 	GetBlogs(limit, offset int) ([]entity.Blog, error)
 	GetBlogsByIds(blogIds []uint64, limit, offset int) ([]entity.Blog, error)
+	GetBlogsByUserId(userid uint64) ([]entity.Blog, error)
 }
 
 type BlogApp struct {
@@ -37,4 +38,8 @@ func (b *BlogApp) GetBlogs(limit, offset int) ([]entity.Blog, error) {
 
 func (b *BlogApp) GetBlogsByIds(blogIds []uint64, limit, offset int) ([]entity.Blog, error) {
 	return b.bg.GetBlogsByIds(blogIds, limit, offset)
+}
+
+func (b *BlogApp) GetBlogsByUserId(userid uint64) ([]entity.Blog, error) {
+	return b.bg.GetBlogsByUserId(userid)
 }

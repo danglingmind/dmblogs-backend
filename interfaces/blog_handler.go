@@ -23,6 +23,11 @@ type Blog struct {
 	au         auth.AuthInterface
 }
 
+type blogRequestPayload struct {
+	blog entity.Blog
+	Tags []entity.Tag
+}
+
 type blogResponse struct {
 	entity.Blog
 	Tags []entity.Tag
@@ -57,19 +62,48 @@ func (bg *Blog) Save(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// parse the blog from body
+	var blogPayload blogRequestPayload
 	var blog entity.Blog
-	err = json.NewDecoder(r.Body).Decode(&blog)
+	err = json.NewDecoder(r.Body).Decode(&blogPayload)
 	if err != nil {
 		Error(w, http.StatusBadRequest, err, "bad request body")
 		return
 	}
+
+	// get the blog
+	blog = blogPayload.blog
+	// get the tags
+	tags := blogPayload.Tags
+
 	// TODO: process the blog before saving into the DB
 
-	_, err = bg.blogApp.Save(blog, userId)
+	savedBlog, err := bg.blogApp.Save(blog, userId)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err, "unable to save the blog")
 		return
 	}
+
+	// create the tag if its a new tag
+	for _, tag := range tags {
+		t, err := bg.tagApp.GetTagByName(tag.Name)
+		if err != nil || t != nil {
+			// tag do not exists create a new tag
+			savedTag, err := bg.tagApp.Save(tag)
+			if err != nil {
+				// TODO: create a retry background task OR push it into an event bus
+			}
+
+			// save the blog-tag mapping
+			var blogTagMapping entity.BlogTag
+			blogTagMapping.BlogId = savedBlog.ID
+			blogTagMapping.TagId = savedTag.ID
+			err = bg.blogTagApp.Save(blogTagMapping)
+			if err != nil {
+				// TODO: Create retry event or PUsh it into an event bus
+			}
+		}
+	}
+
 	JSON(w, http.StatusOK, "")
 }
 
@@ -151,6 +185,10 @@ func (bg *Blog) GetBlogById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	JSON(w, http.StatusOK, blogResp)
+}
+
+func(bg *Blog) GetBlogByUserId(w http.ResponseWriter, r *http.Request){
+	
 }
 
 func (bg *Blog) GetBlogsByTagName(w http.ResponseWriter, r *http.Request) {

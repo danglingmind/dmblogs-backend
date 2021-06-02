@@ -9,11 +9,11 @@ type Blog struct {
 	ID          uint64    `json:"id" gorm:"primary_key;auto_increment"`
 	Title       string    `json:"title" gorm:"not null;"`
 	Description string    `json:"description"`
-	Content     string    `json:"middlename"`
+	Content     string    `json:"content"`
 	Created     time.Time `json:"created"`
 	Modified    time.Time `json:"modified"`
 	Draft       bool      `json:"draft"`
-	UserId      uint64    `json:"userid"`
+	UserId      uint64    `json:"user_id"`
 }
 
 // Bussiness Services for entity

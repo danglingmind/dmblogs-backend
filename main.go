@@ -5,6 +5,7 @@ import (
 
 	"danglingmind.com/ddd/domain/service"
 	"danglingmind.com/ddd/infrastructure/auth"
+	"danglingmind.com/ddd/infrastructure/log"
 	"danglingmind.com/ddd/infrastructure/persistence"
 	"danglingmind.com/ddd/interfaces"
 	"danglingmind.com/ddd/interfaces/middleware"
@@ -15,6 +16,11 @@ func main() {
 
 	// initialize configurations
 	godotenv.Load()
+	// initialize the log
+	logInstance := log.NewLogger()
+	// pass our global logger to the middleware as well
+	logMiddleware := middleware.LoggingMiddleware(logInstance)
+
 	// db config
 	dbdriver := os.Getenv("DB_DRIVER")
 	host := os.Getenv("DB_HOST")
@@ -57,7 +63,8 @@ func main() {
 	server := interfaces.NewServer()
 	// CORS middleware
 	server.Router.Use(middleware.CORSMiddleware)
-
+	// logging middleware
+	server.Router.Use(logMiddleware)
 	// login service endpoints
 	server.AddRoute("PUT", "/register", authenticator.Register)
 	server.AddRoute("POST", "/login", authenticator.Login)
@@ -85,6 +92,13 @@ func main() {
 		Methods("GET").
 		HandlerFunc(blogHandlers.GetBlogById).
 		Name("GetBlogById")
+
+	// get user's blog
+	authenticatedRouter.
+		Path("/blogs/user/{id:[0-9]+}").
+		Methods("GET").
+		HandlerFunc(blogHandlers.GetBlogByUserId).
+		Name("GetBlogsByUserId")
 
 	// support limit and offset query params
 	authenticatedRouter.

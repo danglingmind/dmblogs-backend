@@ -28,7 +28,7 @@ func (b *BlogRepo) Save(blog entity.Blog, userid uint64) (*entity.Blog, error) {
 	}
 
 	err = b.db.Debug().
-		Table("BLOGS").
+		Table("blogs").
 		Create(&blog).Error
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "Duplicate") {
@@ -60,6 +60,16 @@ func (b *BlogRepo) GetBlogById(id uint64) (*entity.Blog, error) {
 	return &blog, err
 }
 
+func (b *BlogRepo) GetBlogsByUserId(userid uint64) ([]entity.Blog, error) {
+	var blogs []entity.Blog
+	err := b.db.Debug().
+		Table("blogs").
+		Where("user_id = ?", userid).
+		Find(&blogs).
+		Error
+	return blogs, err
+}
+
 func (b *BlogRepo) GetBlogs(limit, offset int) ([]entity.Blog, error) {
 	var blogs []entity.Blog
 	err := b.db.Debug().
@@ -68,9 +78,6 @@ func (b *BlogRepo) GetBlogs(limit, offset int) ([]entity.Blog, error) {
 		Offset(offset).
 		Find(&blogs).
 		Error
-	if err != nil {
-		return nil, err
-	}
 	return blogs, err
 }
 
@@ -83,8 +90,5 @@ func (b *BlogRepo) GetBlogsByIds(blogIds []uint64, limit, offset int) ([]entity.
 		Offset(offset).
 		Find(&blogs).
 		Error
-	if err != nil {
-		return nil, err
-	}
 	return blogs, err
 }
