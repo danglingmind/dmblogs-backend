@@ -2,14 +2,12 @@ package interfaces
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
 
 	"danglingmind.com/ddd/application"
 	"danglingmind.com/ddd/domain/entity"
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
 )
 
 type User struct {
@@ -47,8 +45,6 @@ func (u *User) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusInternalServerError, err, err.Error())
 		return
 	}
-	log.Println("testing logger from log package")
-	logrus.Info("testing from logrus")
 	JSON(w, http.StatusOK, users)
 }
 
