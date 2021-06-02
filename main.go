@@ -1,15 +1,16 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"danglingmind.com/ddd/domain/service"
 	"danglingmind.com/ddd/infrastructure/auth"
-	"danglingmind.com/ddd/infrastructure/log"
 	"danglingmind.com/ddd/infrastructure/persistence"
 	"danglingmind.com/ddd/interfaces"
 	"danglingmind.com/ddd/interfaces/middleware"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -17,7 +18,11 @@ func main() {
 	// initialize configurations
 	godotenv.Load()
 	// initialize the log
-	logInstance := log.NewLogger()
+	logInstance := logrus.New()
+	logInstance.SetFormatter(&logrus.JSONFormatter{})
+
+	log.SetOutput(logInstance.Writer())
+	logrus.SetOutput(logInstance.Writer())
 	// pass our global logger to the middleware as well
 	logMiddleware := middleware.LoggingMiddleware(logInstance)
 
