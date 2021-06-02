@@ -19,6 +19,15 @@ type TokenInterface interface {
 
 type Token struct{}
 
+type TokenDetails struct {
+	AccessToken  string
+	RefreshToken string
+	TokenUuid    string
+	RefreshUuid  string
+	AtExpires    int64
+	RtExpires    int64
+}
+
 func NewToken() *Token {
 	return &Token{}
 }

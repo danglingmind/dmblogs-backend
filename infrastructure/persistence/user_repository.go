@@ -32,7 +32,7 @@ func (u *UserRepo) GetById(id uint64) (*entity.User, error) {
 		return nil, err
 	}
 	if gorm.IsRecordNotFoundError(err) {
-		return nil, errors.New("user not found")
+		return nil, err
 	}
 	return &user, nil
 }
@@ -61,7 +61,7 @@ func (u *UserRepo) Save(user *entity.User) (*entity.User, error) {
 			return nil, fmt.Errorf("email or mobile already taken")
 		}
 		//any other db error
-		return nil, fmt.Errorf("database error")
+		return nil, err
 	}
 	return user, nil
 }
@@ -78,7 +78,7 @@ func (u *UserRepo) GetByEmailPassword(us *entity.User) (*entity.User, error) {
 	//Verify the password
 	err = security.VerifyPassword(user.Password, us.Password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return nil, fmt.Errorf("incorrect password")
+		return nil, err
 	}
 	return &user, nil
 }

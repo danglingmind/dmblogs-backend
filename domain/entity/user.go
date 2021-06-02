@@ -12,17 +12,17 @@ import (
 )
 
 type User struct {
-	ID          int       `json:"id" type:"int"`
-	Firstname   string    `json:"firstname" type:"string"`
-	Middlename  string    `json:"middlename" type:"string"`
-	Lastname    string    `json:"lastname" type:"string"`
+	ID          int       `json:"id" gorm:"primary_key;auto_increment"`
+	Firstname   string    `json:"firstname" gorm:"size:100;not null;"`
+	Middlename  string    `json:"middlename" gorm:"size:100;"`
+	Lastname    string    `json:"lastname" gorm:"size:100;"`
 	Countrycode string    `json:"countrycode" type:"string"`
-	Mobile      string    `json:"mobile" type:"string"`
-	Email       string    `json:"email" type:"string"`
-	Password    string    `json:"password" type:"string"`
-	Created     time.Time `json:"created" type:"time"`
-	Modified    time.Time `json:"modified" type:"time"`
-	Active      bool      `json:"active" type:"bool"`
+	Mobile      string    `json:"mobile" gorm:"size:10;"`
+	Email       string    `json:"email" gorm:"size:100;not null;unique"`
+	Password    string    `json:"password" gorm:"size:100;not null;"`
+	Created     time.Time `json:"created" gorm:"default:CURRENT_TIMESTAMP"`
+	Modified    time.Time `json:"modified" gorm:"default:CURRENT_TIMESTAMP"`
+	Active      bool      `json:"active" gorm:"default:1;"`
 }
 
 func NewEmptyUser() User {

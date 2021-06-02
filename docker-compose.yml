@@ -1,14 +1,23 @@
 version: '3'
 services: 
     postgres:
-        build: 
-            context: .
-            dockerfile: Dockerfile.postgres
+        image: postgres
+        restart: always
+        environment:
+            - POSTGRES_USER=danglingmind
+            - POSTGRES_PASSWORD=#ricky2327
+            - POSTGRES_DB=blogapp
+        logging:
+          options:
+            max-size: 10m
+            max-file: "3"
         container_name: postgres
         ports:
             - 5432:5432
         volumes: 
             - db-data:/var/lib/postres/data
+            # copy table creation scripts
+            - ./create-tables-postgres.sql:/docker-entrypoint-initdb.d/create_tables.sql
         networks: 
             - overlay
 
@@ -30,7 +39,7 @@ services:
             - "8000:8000"
         environment: 
             - GREETING="hello world"
-        env_file: .env
+        env_file: .env_docker
         networks: 
             - overlay
         depends_on: 

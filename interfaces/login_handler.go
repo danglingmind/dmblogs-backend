@@ -24,6 +24,52 @@ func NewAuthenticator(uApp application.UserAppInterface, au auth.AuthInterface, 
 	}
 }
 
+func (au *Authenticate) Register(w http.ResponseWriter, r *http.Request) {
+	// get the user
+	u := entity.NewEmptyUser()
+	err := json.NewDecoder(r.Body).Decode(&u)
+	if err != nil {
+		Error(w, http.StatusBadRequest, err, "bad request body")
+		return
+	}
+	// validate user json
+	if ok, err := u.Validate(); !ok {
+		Error(w, http.StatusMethodNotAllowed, err, err.Error())
+		return
+	}
+
+	// save the user into db
+	_, err = au.userApp.Save(&u)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, err, err.Error())
+		return
+	}
+
+	// return a new token to the user
+	// create new token
+	tk, err := au.tokenInterface.CreateToken(uint64(u.ID))
+	if err != nil {
+		Error(w, http.StatusInternalServerError, err, err.Error())
+		return
+	}
+
+	err = au.authInterface.CreateAuth(uint64(u.ID), tk)
+	if err != nil {
+		log.Printf("ERR: error while storing the token")
+		Error(w, http.StatusInternalServerError, err, err.Error())
+		return
+	}
+
+	userData := make(map[string]interface{})
+	userData["access_token"] = tk.AccessToken
+	userData["refresh_token"] = tk.RefreshToken
+	userData["id"] = u.ID
+	userData["first_name"] = u.Firstname
+	userData["last_name"] = u.Lastname
+	userData["middle_name"] = u.Middlename
+	JSON(w, http.StatusOK, userData)
+}
+
 func (au *Authenticate) Login(w http.ResponseWriter, r *http.Request) {
 	// get the user
 	u := entity.NewEmptyUser()

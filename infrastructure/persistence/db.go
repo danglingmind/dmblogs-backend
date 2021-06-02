@@ -10,8 +10,11 @@ import (
 )
 
 type Repositories struct {
-	User repository.UserRepository
-	db   *gorm.DB
+	User    repository.UserRepository
+	Blog    repository.BlogRepository
+	Tag     repository.TagRepository
+	BlogTag repository.BlogTagRepository
+	db      *gorm.DB
 }
 
 func NewRepositories(Dbdriver, DbUser, DbPassword, DbPort, DbHost, DbName string) (*Repositories, error) {
@@ -27,8 +30,10 @@ func NewRepositories(Dbdriver, DbUser, DbPassword, DbPort, DbHost, DbName string
 	db.LogMode(true)
 
 	return &Repositories{
-		User: NewUserRepository(db),
-		db:   db,
+		User:    NewUserRepository(db),
+		Blog:    NewBlogRepository(db),
+		BlogTag: NewBlogTagRepo(db),
+		db:      db,
 	}, nil
 }
 
