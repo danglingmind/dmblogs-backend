@@ -38,7 +38,7 @@ jobs:
           name: dmblogs
           path: dmblogs
 
-  Integration Test:
+  Integration-Test:
     runs-on: ubuntu-latest
     needs: Build
     steps:
