@@ -49,6 +49,8 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: dmblogs
+      - name: Change permission for dmblogs
+        run: chmod 755 dmblogs
 
       - name: Setup Integration test environment
         run: make docker.start.components
@@ -58,5 +60,7 @@ jobs:
       
       - name: Teardown Integration test environment
         run: make docker.stop
+
+
 
 
