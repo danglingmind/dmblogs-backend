@@ -8,8 +8,6 @@ on:
 
 jobs:
   Test:
-    - name: Integration tests
-      needs: Build
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v2
@@ -32,7 +30,6 @@ jobs:
           run: make docker.stop
 
   Build:
-    - name: Build application
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v2
