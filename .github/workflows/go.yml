@@ -13,38 +13,50 @@ on:
         default: 'Prateek'
 
 jobs:
-  Test:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
-
-        - name: Set up Go
-          uses: actions/setup-go@v2
-          with:
-            go-version: 1.15
-
-        - name: Run Unit Tests
-          run: make test
-
-        - name: Setup Integration test environment
-          run: make docker.start.components
-
-        - name: Run integration tests
-          run: make test.integration
-        
-        - name: Teardown Integration test environment
-          run: make docker.stop
-
   Build:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-        - name: Set up Go
-          uses: actions/setup-go@v2
-          with:
-            go-version: 1.15
-          
-        - name: Build
-          run: make build
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+        
+      - name: Build
+        run: make build
+
+      - name: Save application binary for next step
+        uses: actions/upload-artifact@v2
+        with:
+          name: dmblogs binary
+          path: dmblogs
+  Test:
+    runs-on: ubuntu-latest
+    needs: Build
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+
+      - name: Run Unit Tests
+        run: make test
+
+      - name: Download application binary
+        uses: actions/download-artifact@v2
+        with:
+          name: gmblogs
+
+      - name: Setup Integration test environment
+        run: make docker.start.components
+
+      - name: Run integration tests
+        run: make test.integration
+      
+      - name: Teardown Integration test environment
+        run: make docker.stop
+
 
