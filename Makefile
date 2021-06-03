@@ -19,8 +19,8 @@ test.integration:
 test.integration.debug:
   go test -tags=integration $(INTEGRATION_TEST_PATH) -count=1 -v -run=$(INTEGRATION_TEST_SUITE_PATH)
 
-test
+test:
 go test -v  ./...
 
-build
+build:
 GO111MODULE=on CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -a -installsuffix cgo -o dmblogs .
