@@ -48,7 +48,7 @@ jobs:
       - name: Download application binary
         uses: actions/download-artifact@v2
         with:
-          name: gmblogs
+          name: dmblogs
 
       - name: Setup Integration test environment
         run: make docker.start.components
