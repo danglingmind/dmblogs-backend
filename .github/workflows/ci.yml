@@ -66,6 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: Integration-Test
     steps:
+      - name: Preparing to tag master after a push
         run: echo  ${{ github.event_name }}
 
 
