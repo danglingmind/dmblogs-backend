@@ -1,25 +1,33 @@
-name: Release
-on:
-  create:
-    tags:
-      - v*
+# TODO
+# name: Release
+# on:
+#   workflow_dispatch:
+#   inputs:
+#     name:
+#       description: 'Person to greet'
+#       required: true
+#       default: 'Prateek'
+#     version:
+#       description: 'Version of the release'
+#       required: true
+#       default: ''
 
-jobs:
-  release:
-    name: Release on GitHub
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v1
+# jobs:
+#   release:
+#     name: Release on GitHub
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Check out code
+#         uses: actions/checkout@v1
 
-      - name: Validates GO releaser config
-        uses: docker://goreleaser/goreleaser:latest
-        with:
-          args: check
+#       - name: Validates GO releaser config
+#         uses: docker://goreleaser/goreleaser:latest
+#         with:
+#           args: check
 
-      - name: Create release on GitHub
-        uses: docker://goreleaser/goreleaser:latest
-        with:
-          args: release
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+#       - name: Create release on GitHub
+#         uses: docker://goreleaser/goreleaser:latest
+#         with:
+#           args: release
+#         env:
+#           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
