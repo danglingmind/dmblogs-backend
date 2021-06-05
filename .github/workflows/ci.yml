@@ -1,4 +1,4 @@
-name: Go
+name: CI
 
 on:
   push:
@@ -92,7 +92,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: danglingmind/dmblog-go-backend:V${{steps.create_tag.tag_name)}}
+          tags: danglingmind/dmblog-go-backend:V${{steps.create_tag.tag_name}}
 
 
 
