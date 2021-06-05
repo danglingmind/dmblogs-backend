@@ -60,12 +60,6 @@ jobs:
       
       - name: Teardown Integration test environment
         run: make docker.stop
-      
-      - name: Save application binary for next step
-        uses: actions/upload-artifact@v2
-        with:
-          name: dmblogs
-          path: dmblogs
 
   Tag:
     #if: ${{ github.event_name == 'push' }}
@@ -79,12 +73,6 @@ jobs:
           ./generate-tag.sh
           echo "::set-output name=tag_name::$(git describe --abbrev=0 --tags)\n"
         id: create_tag
-
-      - name: Save application binary for next step
-        uses: actions/upload-artifact@v2
-        with:
-          name: dmblogs
-          path: dmblogs
 
   Push-To-Docker-Registry:
     #if: ${{ github.event_name == 'push' }}
