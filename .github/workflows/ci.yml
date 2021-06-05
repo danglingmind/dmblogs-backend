@@ -74,9 +74,8 @@ jobs:
         id: create_tag
         run: |
           ./generate-tag.sh
-          echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
-          echo ${GITHUB_REF#refs/*/}
-          echo "deepak"
+          echo "::set-output name=tag::${git describe --abbrev=0 --tags}"
+          echo ${git describe --abbrev=0 --tags}
 
   Push-To-Docker-Registry:
     #if: ${{ github.event_name == 'push' }}
