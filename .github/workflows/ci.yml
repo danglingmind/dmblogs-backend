@@ -64,15 +64,17 @@ jobs:
   Tag:
     #if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
+    outputs:
+      tag_name: ${{ steps.Tag.outputs.tag }}
     needs: Integration-Test
     steps:
       - uses: actions/checkout@v2
 
       - name: Preparing to tag master after a push
+        id: create_tag
         run: |
           ./generate-tag.sh
-          echo "::set-output name=tag_name::$(git describe --abbrev=0 --tags)\n"
-        id: create_tag
+          echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
 
   Push-To-Docker-Registry:
     #if: ${{ github.event_name == 'push' }}
@@ -98,7 +100,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: danglingmind/dmblog-go-backend:v${{ steps.create_tag.outputs.tag_name }}
+          tags: danglingmind/dmblog-go-backend:v${{ needs.Tag.outputs.tag_name }}
 
 
 
