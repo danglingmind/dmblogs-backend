@@ -65,7 +65,7 @@ jobs:
     #if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     outputs:
-      tag_name: ${{ steps.Tag.outputs.tag }}
+      tag_name: ${{ steps.create_tag.outputs.tag }}
     needs: Integration-Test
     steps:
       - uses: actions/checkout@v2
@@ -75,6 +75,8 @@ jobs:
         run: |
           ./generate-tag.sh
           echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
+          echo ${GITHUB_REF#refs/*/}
+          echo "deepak"
 
   Push-To-Docker-Registry:
     #if: ${{ github.event_name == 'push' }}
