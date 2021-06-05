@@ -87,11 +87,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: dmblogs
-
-      - name: Copy applicatino to current directory
-        run: |
-          pwd
-          ls -l
         
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
@@ -103,7 +98,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: danglingmind/dmblog-go-backend:V${{ steps.create_tag.tag_name }}
+          tags: danglingmind/dmblog-go-backend:v${{ steps.create_tag.outputs.tag_name }}
 
 
 
