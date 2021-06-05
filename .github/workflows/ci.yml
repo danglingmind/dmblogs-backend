@@ -60,6 +60,12 @@ jobs:
       
       - name: Teardown Integration test environment
         run: make docker.stop
+      
+      - name: Save application binary for next step
+        uses: actions/upload-artifact@v2
+        with:
+          name: dmblogs
+          path: dmblogs
 
   Tag:
     #if: ${{ github.event_name == 'push' }}
@@ -74,6 +80,12 @@ jobs:
           echo "::set-output name=tag_name::$(git describe --abbrev=0 --tags)\n"
         id: create_tag
 
+      - name: Save application binary for next step
+        uses: actions/upload-artifact@v2
+        with:
+          name: dmblogs
+          path: dmblogs
+
   Push-To-Docker-Registry:
     #if: ${{ github.event_name == 'push' }}
     name: Push Docker image to Docker Hub
@@ -82,6 +94,11 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
+
+      - name: Download application binary
+        uses: actions/download-artifact@v2
+        with:
+          name: dmblogs
         
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
