@@ -87,7 +87,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: dmblogs
-          path: ./
+
+      - name: Copy applicatino to current directory
+        run: |
+          echo pwd
+          cp /home/runner/work/dmblogs-backend/dmblogs-backend/dmblogs .
         
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
