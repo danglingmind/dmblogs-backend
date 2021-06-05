@@ -1,4 +1,4 @@
 FROM alpine:latest
-ADD dmblogs .
+ADD ./dmblogs .
 
 CMD ["./dmblogs"]
