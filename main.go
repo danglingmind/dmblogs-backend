@@ -71,8 +71,8 @@ func main() {
 	// logging middleware
 	server.Router.Use(logMiddleware)
 	// login service endpoints
-	server.AddRoute("PUT", "/register", authenticator.Register)
-	server.AddRoute("POST", "/login", authenticator.Login)
+	server.AddRoute("PUT", "/users/register", authenticator.Register)
+	server.AddRoute("POST", "/users/login", authenticator.Login)
 
 	// add authentication to login routes
 	authenticatedRouter := server.Router.PathPrefix("/auth/").Subrouter()
@@ -83,7 +83,7 @@ func main() {
 
 	// user service endpoints
 	server.AddRoute("GET", "/users", usersHandlers.GetAllUsers)
-	server.AddRoute("GET", "/users/{id:[0-9]+}", usersHandlers.GetUserById)
+	server.AddRoute("GET", "/users/{id}", usersHandlers.GetUserById)
 
 	// blogs endpoints
 	authenticatedRouter.

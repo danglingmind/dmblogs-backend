@@ -13,6 +13,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang-migrate/migrate v3.5.4+incompatible // indirect
 	github.com/gomodule/redigo v1.8.4
+	github.com/google/uuid v1.2.0
 	github.com/gorilla/mux v1.8.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.3.0
@@ -21,9 +22,8 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
-	github.com/spf13/viper v1.7.1 // indirect
-	github.com/stretchr/testify v1.7.0
-	github.com/twinj/uuid v1.0.0
+	github.com/stretchr/testify v1.6.1
+	github.com/twinj/uuid v1.0.0 // indirect
 	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect

@@ -8,6 +8,7 @@ import (
 	"danglingmind.com/ddd/domain/entity"
 	"danglingmind.com/ddd/domain/repository"
 	"danglingmind.com/ddd/infrastructure/security"
+	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -25,7 +26,7 @@ func NewUserRepository(db *gorm.DB) *UserRepo {
 	}
 }
 
-func (u *UserRepo) GetById(id uint64) (*entity.User, error) {
+func (u *UserRepo) GetById(id uuid.UUID) (*entity.User, error) {
 	var user entity.User
 	err := u.db.Debug().Where("id = ?", id).Take(&user).Error
 	if err != nil {
@@ -50,11 +51,8 @@ func (u *UserRepo) GetAll() ([]entity.User, error) {
 }
 
 func (u *UserRepo) Save(user *entity.User) (*entity.User, error) {
-	err := user.PrepareToSave()
-	if err != nil {
-		return nil, err
-	}
-	err = u.db.Debug().Create(&user).Error
+
+	err := u.db.Debug().Create(&user).Error
 	if err != nil {
 		//If the email is already taken
 		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "Duplicate") {

@@ -39,7 +39,7 @@ func (au *Authenticate) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// save the user into db
-	_, err = au.userApp.Save(&u)
+	user, err := au.userApp.Save(&u)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err, err.Error())
 		return
@@ -47,13 +47,13 @@ func (au *Authenticate) Register(w http.ResponseWriter, r *http.Request) {
 
 	// return a new token to the user
 	// create new token
-	tk, err := au.tokenInterface.CreateToken(uint64(u.ID))
+	tk, err := au.tokenInterface.CreateToken(user.ID)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err, err.Error())
 		return
 	}
 
-	err = au.authInterface.CreateAuth(uint64(u.ID), tk)
+	err = au.authInterface.CreateAuth(user.ID, tk)
 	if err != nil {
 		log.Printf("ERR: error while storing the token")
 		Error(w, http.StatusInternalServerError, err, err.Error())
@@ -63,10 +63,10 @@ func (au *Authenticate) Register(w http.ResponseWriter, r *http.Request) {
 	userData := make(map[string]interface{})
 	userData["access_token"] = tk.AccessToken
 	userData["refresh_token"] = tk.RefreshToken
-	userData["id"] = u.ID
-	userData["first_name"] = u.Firstname
-	userData["last_name"] = u.Lastname
-	userData["middle_name"] = u.Middlename
+	userData["id"] = user.ID
+	userData["first_name"] = user.Firstname
+	userData["last_name"] = user.Lastname
+	userData["middle_name"] = user.Middlename
 	JSON(w, http.StatusOK, userData)
 }
 
@@ -91,13 +91,13 @@ func (au *Authenticate) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create new token
-	tk, err := au.tokenInterface.CreateToken(uint64(user.ID))
+	tk, err := au.tokenInterface.CreateToken(user.ID)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err, err.Error())
 		return
 	}
 
-	err = au.authInterface.CreateAuth(uint64(user.ID), tk)
+	err = au.authInterface.CreateAuth(user.ID, tk)
 	if err != nil {
 		log.Printf("ERR: error while storing the token")
 		Error(w, http.StatusInternalServerError, err, err.Error())
