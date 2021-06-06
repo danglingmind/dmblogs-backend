@@ -23,8 +23,6 @@ services:
         container_name: redis
         ports: 
             - 6379:6379
-        networks: 
-            - overlay
 
     backend:
         build: 
