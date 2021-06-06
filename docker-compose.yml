@@ -34,7 +34,7 @@ services:
         build: 
             context: .
             dockerfile: Dockerfile 
-        container_name: dbblogs-backend
+        container_name: dmblogs-backend
         ports:
             - "8000:8000"
         environment: 
