@@ -10,6 +10,7 @@ import (
 	"danglingmind.com/ddd/domain/entity"
 	"danglingmind.com/ddd/domain/service"
 	"danglingmind.com/ddd/infrastructure/auth"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -187,8 +188,8 @@ func (bg *Blog) GetBlogById(w http.ResponseWriter, r *http.Request) {
 	JSON(w, http.StatusOK, blogResp)
 }
 
-func(bg *Blog) GetBlogByUserId(w http.ResponseWriter, r *http.Request){
-	
+func (bg *Blog) GetBlogByUserId(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func (bg *Blog) GetBlogsByTagName(w http.ResponseWriter, r *http.Request) {
@@ -319,7 +320,7 @@ func (bg *Blog) GetBlogs(w http.ResponseWriter, r *http.Request) {
 }
 
 // internal method
-func (bg *Blog) validateUser(r *http.Request) (userId uint64, err error) {
+func (bg *Blog) validateUser(r *http.Request) (userId uuid.UUID, err error) {
 	// get user's metadata
 	userMeta, err := bg.tk.ExtractTokenMetadata(r)
 	if err != nil {

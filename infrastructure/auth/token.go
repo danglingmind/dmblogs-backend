@@ -4,16 +4,15 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/twinj/uuid"
+	"github.com/google/uuid"
 )
 
 type TokenInterface interface {
-	CreateToken(userid uint64) (*TokenDetails, error)
+	CreateToken(userid uuid.UUID) (*TokenDetails, error)
 	ExtractTokenMetadata(*http.Request) (*AccessDetails, error)
 }
 
@@ -35,13 +34,13 @@ func NewToken() *Token {
 //Token implements the TokenInterface
 var _ TokenInterface = &Token{}
 
-func (t *Token) CreateToken(userid uint64) (*TokenDetails, error) {
+func (t *Token) CreateToken(userid uuid.UUID) (*TokenDetails, error) {
 	td := &TokenDetails{}
 	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
-	td.TokenUuid = uuid.NewV4().String()
+	td.TokenUuid = uuid.New().String()
 
 	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
-	td.RefreshUuid = td.TokenUuid + "++" + strconv.Itoa(int(userid))
+	td.RefreshUuid = td.TokenUuid + "++" + userid.String()
 
 	var err error
 	//Creating Access Token
@@ -104,26 +103,30 @@ func ExtractToken(r *http.Request) string {
 	return ""
 }
 
-func (t *Token) ExtractTokenMetadata(r *http.Request) (*AccessDetails, error) {
-	fmt.Println("WE ENTERED METADATA")
+func (t *Token) ExtractTokenMetadata(r *http.Request) (accessDetails *AccessDetails, err error) {
+	defer func() {
+		if err := recover(); err != nil {
+			accessDetails = nil
+			err = fmt.Errorf("couldn't find userid from token")
+		}
+	}()
+
 	token, err := VerifyToken(r)
 	if err != nil {
-		return nil, err
+		return
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok && token.Valid {
 		accessUuid, ok := claims["access_uuid"].(string)
 		if !ok {
-			return nil, err
+			return
 		}
-		userId, err := strconv.ParseUint(fmt.Sprintf("%.f", claims["user_id"]), 10, 64)
-		if err != nil {
-			return nil, err
-		}
-		return &AccessDetails{
-			TokenUuid: accessUuid,
-			UserId:    userId,
-		}, nil
+
+		userId := uuid.MustParse(fmt.Sprintf("%s", claims["user_id"]))
+		accessDetails.TokenUuid = accessUuid
+		accessDetails.UserId = userId
+		err = nil
+		return
 	}
 	return nil, err
 }

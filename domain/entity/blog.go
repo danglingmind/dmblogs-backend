@@ -3,6 +3,8 @@ package entity
 import (
 	"fmt"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Blog struct {
@@ -13,7 +15,7 @@ type Blog struct {
 	Created     time.Time `json:"created"`
 	Modified    time.Time `json:"modified"`
 	Draft       bool      `json:"draft"`
-	UserId      uint64    `json:"user_id"`
+	UserId      uuid.UUID `json:"user_id"`
 }
 
 // Bussiness Services for entity

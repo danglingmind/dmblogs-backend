@@ -9,10 +9,12 @@ import (
 
 	"danglingmind.com/ddd/infrastructure/security"
 	"github.com/badoux/checkmail"
+	"github.com/google/uuid"
+	"github.com/jinzhu/gorm"
 )
 
 type User struct {
-	ID          int       `json:"id" gorm:"primary_key;auto_increment"`
+	ID          uuid.UUID `json:"id" gorm:"primary_key"`
 	Firstname   string    `json:"firstname" gorm:"size:100;not null;"`
 	Middlename  string    `json:"middlename" gorm:"size:100;"`
 	Lastname    string    `json:"lastname" gorm:"size:100;"`
@@ -29,7 +31,10 @@ func NewEmptyUser() User {
 	return User{}
 }
 
-func (u *User) PrepareToSave() (err error) {
+// gorm hooks
+func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+	u.ID = uuid.New()
+
 	u.Active = true // Set default active to active (true)
 	u.Created = time.Now()
 	u.Modified = time.Now()
@@ -44,7 +49,9 @@ func (u *User) PrepareToSave() (err error) {
 	}
 	u.Password = string(passEncrypted)
 
-	return nil
+	_, err = u.Validate()
+
+	return
 }
 
 func (u *User) Validate() (bool, error) {
