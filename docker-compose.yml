@@ -17,8 +17,6 @@ services:
             - db-data:/var/lib/postres/data
             # copy table creation scripts
             - ./create-tables-postgres.sql:/docker-entrypoint-initdb.d/create_tables.sql
-        networks: 
-            - overlay
 
     redis:
         image: redis
@@ -36,8 +34,6 @@ services:
         ports:
             - "8000:8000"
         env_file: .env_docker
-        networks: 
-            - overlay
         depends_on: 
             - redis 
             - postgres
@@ -46,5 +42,3 @@ volumes:
     db-data:
         external: false
 
-networks:
-    overlay:

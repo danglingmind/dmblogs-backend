@@ -56,8 +56,6 @@ jobs:
         run: |
           make docker.start.components
           docker ps
-          docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' dmblogs-backend
-          echo exec("/sbin/ip route|awk '/default/ { print $3 }'")
           curl -X POST http://localhost:8000/login
 
 
