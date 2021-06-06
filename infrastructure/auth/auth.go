@@ -2,15 +2,15 @@ package auth
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
+	"github.com/google/uuid"
 )
 
 type AuthInterface interface {
-	CreateAuth(uint64, *TokenDetails) error
-	FetchAuth(string) (uint64, error)
+	CreateAuth(uuid.UUID, *TokenDetails) error
+	FetchAuth(string) (uuid.UUID, error)
 	DeleteRefresh(string) error
 	DeleteTokens(*AccessDetails) error
 }
@@ -27,16 +27,16 @@ func NewAuth(client redis.Conn) *ClientData {
 
 type AccessDetails struct {
 	TokenUuid string
-	UserId    uint64
+	UserId    uuid.UUID
 }
 
 //Save token metadata to Redis
-func (tk *ClientData) CreateAuth(userid uint64, td *TokenDetails) error {
+func (tk *ClientData) CreateAuth(userid uuid.UUID, td *TokenDetails) error {
 	at := time.Unix(td.AtExpires, 0) //converting Unix to UTC(to Time object)
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
 
-	_, err := tk.client.Do("SET", td.TokenUuid, strconv.Itoa(int(userid)))
+	_, err := tk.client.Do("SET", td.TokenUuid, userid)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (tk *ClientData) CreateAuth(userid uint64, td *TokenDetails) error {
 		return err
 	}
 
-	_, err = tk.client.Do("SET", td.RefreshUuid, strconv.Itoa(int(userid)))
+	_, err = tk.client.Do("SET", td.RefreshUuid, userid)
 	if err != nil {
 		return err
 	}
@@ -57,12 +57,13 @@ func (tk *ClientData) CreateAuth(userid uint64, td *TokenDetails) error {
 }
 
 //Check the metadata saved
-func (tk *ClientData) FetchAuth(tokenUuid string) (uint64, error) {
-	userid, err := redis.Uint64(tk.client.Do("GET", tokenUuid))
+func (tk *ClientData) FetchAuth(tokenUuid string) (userUUID uuid.UUID, err error) {
+	userid, err := redis.Bytes(tk.client.Do("GET", tokenUuid))
 	if err != nil {
-		return 0, err
+		return
 	}
-	return userid, nil
+	userUUID, err = uuid.FromBytes(userid)
+	return
 }
 
 //Once a user row in the token table

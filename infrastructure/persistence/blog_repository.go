@@ -6,6 +6,7 @@ import (
 
 	"danglingmind.com/ddd/domain/entity"
 	"danglingmind.com/ddd/domain/repository"
+	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 )
 
@@ -21,7 +22,7 @@ func NewBlogRepository(db *gorm.DB) *BlogRepo {
 	}
 }
 
-func (b *BlogRepo) Save(blog entity.Blog, userid uint64) (*entity.Blog, error) {
+func (b *BlogRepo) Save(blog entity.Blog, userid uuid.UUID) (*entity.Blog, error) {
 	err := blog.PreSaveValidate()
 	if err != nil {
 		return nil, err
@@ -60,7 +61,7 @@ func (b *BlogRepo) GetBlogById(id uint64) (*entity.Blog, error) {
 	return &blog, err
 }
 
-func (b *BlogRepo) GetBlogsByUserId(userid uint64) ([]entity.Blog, error) {
+func (b *BlogRepo) GetBlogsByUserId(userid uuid.UUID) ([]entity.Blog, error) {
 	var blogs []entity.Blog
 	err := b.db.Debug().
 		Table("blogs").
