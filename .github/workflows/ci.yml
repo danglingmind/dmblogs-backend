@@ -53,7 +53,9 @@ jobs:
         run: chmod 755 dmblogs
 
       - name: Setup Integration test environment
-        run: make docker.start.components
+        run: |
+          make docker.start.components
+          docker ps
 
       - name: Run integration tests
         run: make test.integration
