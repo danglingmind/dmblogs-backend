@@ -43,7 +43,7 @@ func (s *e2eTestSuite) Test_Integration_VerifyThatLoginActionReturnsNoRecordFoun
 		"email" : "deepak@gmail.com",
 		"password" : "test"
 	}`)
-	req, err := http.NewRequest(echo.POST, fmt.Sprintf("http://0.0.0.0:%d/login", s.port), body)
+	req, err := http.NewRequest(echo.POST, fmt.Sprintf("http://127.0.0.1:%d/login", s.port), body)
 	s.NoError(err)
 
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
