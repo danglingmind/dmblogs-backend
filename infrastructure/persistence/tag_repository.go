@@ -24,7 +24,7 @@ func (t *TagRepo) Save(tag entity.Tag) (*entity.Tag, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = t.db.Debug().Table("TAGS").Create(&tag).Error
+	err = t.db.Debug().Table("tags").Create(&tag).Error
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (t *TagRepo) Save(tag entity.Tag) (*entity.Tag, error) {
 func (t *TagRepo) DeleteById(id uint64) error {
 	var tag entity.Tag
 	tag.ID = id
-	err := t.db.Debug().Table("TAGS").Delete(&tag).Error
+	err := t.db.Debug().Table("tags").Delete(&tag).Error
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (t *TagRepo) DeleteById(id uint64) error {
 
 func (t *TagRepo) DeleteByName(name string) error {
 	err := t.db.Debug().
-		Table("TAGS").
+		Table("tags").
 		Delete(entity.Tag{}, "name like lower(?)", strings.ToLower(name)).Error
 	if err != nil {
 		return err
@@ -54,7 +54,7 @@ func (t *TagRepo) DeleteByName(name string) error {
 func (t *TagRepo) GetAllTags(limit, offset int) ([]entity.Tag, error) {
 	var tags []entity.Tag
 	err := t.db.Debug().
-		Table("TAGS").
+		Table("tags").
 		Limit(limit).
 		Offset(offset).
 		Error
@@ -67,7 +67,7 @@ func (t *TagRepo) GetAllTags(limit, offset int) ([]entity.Tag, error) {
 func (t *TagRepo) GetTagById(id uint64) (*entity.Tag, error) {
 	var tag entity.Tag
 	err := t.db.Debug().
-		Table("TAGS").
+		Table("tags").
 		Where("id = ?", id).
 		Find(&tag).
 		Error
@@ -77,8 +77,9 @@ func (t *TagRepo) GetTagById(id uint64) (*entity.Tag, error) {
 func (t *TagRepo) GetTagByName(name string) (*entity.Tag, error) {
 	var tag entity.Tag
 	err := t.db.Debug().
-		Table("TAGS").
+		Table("tags").
 		Where("name like lower(?)", strings.ToLower(name)).
+		Find(&tag).
 		Error
 	if err != nil {
 		return nil, err
@@ -89,7 +90,7 @@ func (t *TagRepo) GetTagByName(name string) (*entity.Tag, error) {
 func (t *TagRepo) GetTagsByIds(ids []uint64) ([]entity.Tag, error) {
 	var tags []entity.Tag
 	err := t.db.Debug().
-		Table("TAGS").
+		Table("tags").
 		Where("id IN ?", ids).
 		Find(&tags).
 		Error

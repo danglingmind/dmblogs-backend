@@ -36,7 +36,7 @@ var _ TokenInterface = &Token{}
 
 func (t *Token) CreateToken(userid uuid.UUID) (*TokenDetails, error) {
 	td := &TokenDetails{}
-	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
+	td.AtExpires = time.Now().Add(time.Minute * 150).Unix()
 	td.TokenUuid = uuid.New().String()
 
 	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
@@ -103,30 +103,30 @@ func ExtractToken(r *http.Request) string {
 	return ""
 }
 
-func (t *Token) ExtractTokenMetadata(r *http.Request) (accessDetails *AccessDetails, err error) {
+func (t *Token) ExtractTokenMetadata(r *http.Request) (*AccessDetails, error) {
+	var accessDetails = &AccessDetails{}
 	defer func() {
 		if err := recover(); err != nil {
 			accessDetails = nil
 			err = fmt.Errorf("couldn't find userid from token")
 		}
 	}()
-
 	token, err := VerifyToken(r)
 	if err != nil {
-		return
+		return accessDetails, err
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok && token.Valid {
 		accessUuid, ok := claims["access_uuid"].(string)
 		if !ok {
-			return
+			return accessDetails, fmt.Errorf("couldn't find access token")
 		}
 
 		userId := uuid.MustParse(fmt.Sprintf("%s", claims["user_id"]))
 		accessDetails.TokenUuid = accessUuid
 		accessDetails.UserId = userId
 		err = nil
-		return
+		return accessDetails, err
 	}
 	return nil, err
 }
