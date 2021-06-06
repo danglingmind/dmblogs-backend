@@ -56,7 +56,9 @@ jobs:
         run: |
           make docker.start.components
           docker ps
+          echo exec("/sbin/ip route|awk '/default/ { print $3 }'")
           curl -X POST http://localhost:8000/login
+
 
       - name: Run integration tests
         run: make test.integration
