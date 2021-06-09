@@ -58,11 +58,12 @@ func (tk *ClientData) CreateAuth(userid uuid.UUID, td *TokenDetails) error {
 
 //Check the metadata saved
 func (tk *ClientData) FetchAuth(tokenUuid string) (userUUID uuid.UUID, err error) {
-	userid, err := redis.Bytes(tk.client.Do("GET", tokenUuid))
+	userid, err := redis.String(tk.client.Do("GET", tokenUuid))
 	if err != nil {
 		return
 	}
-	userUUID, err = uuid.FromBytes(userid)
+	
+	userUUID, err = uuid.Parse(userid)
 	return
 }
 

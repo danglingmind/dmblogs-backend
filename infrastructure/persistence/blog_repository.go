@@ -83,10 +83,23 @@ func (b *BlogRepo) GetBlogs(limit, offset int) ([]entity.Blog, error) {
 }
 
 func (b *BlogRepo) GetBlogsByIds(blogIds []uint64, limit, offset int) ([]entity.Blog, error) {
+	// gorm does not support the slice we have to prepare the IN statement
+	inStatement := "id IN ("
+	var params []interface{}
+	for idx, i := range blogIds {
+		params = append(params, i)
+		if idx != len(blogIds)-1 {
+			inStatement += "?,"
+		} else {
+			inStatement += "?"
+		}
+	}
+	inStatement += ")"
+
 	var blogs []entity.Blog
 	err := b.db.Debug().
 		Table("blogs").
-		Where("id IN ?", blogIds).
+		Where(inStatement, params...).
 		Limit(limit).
 		Offset(offset).
 		Find(&blogs).

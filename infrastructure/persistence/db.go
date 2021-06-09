@@ -32,6 +32,7 @@ func NewRepositories(Dbdriver, DbUser, DbPassword, DbPort, DbHost, DbName string
 	return &Repositories{
 		User:    NewUserRepository(db),
 		Blog:    NewBlogRepository(db),
+		Tag:     NewTagRepo(db),
 		BlogTag: NewBlogTagRepo(db),
 		db:      db,
 	}, nil

@@ -12,6 +12,7 @@ import (
 	"danglingmind.com/ddd/infrastructure/auth"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
 type Blog struct {
@@ -25,8 +26,8 @@ type Blog struct {
 }
 
 type blogRequestPayload struct {
-	blog entity.Blog
-	Tags []entity.Tag
+	Blog entity.Blog  `json:"blog"`
+	Tags []entity.Tag `json:"tags"`
 }
 
 type blogResponse struct {
@@ -72,7 +73,8 @@ func (bg *Blog) Save(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get the blog
-	blog = blogPayload.blog
+	blog = blogPayload.Blog
+	blog.UserId = userId
 	// get the tags
 	tags := blogPayload.Tags
 
@@ -85,13 +87,17 @@ func (bg *Blog) Save(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create the tag if its a new tag
-	for _, tag := range tags {
-		t, err := bg.tagApp.GetTagByName(tag.Name)
-		if err != nil || t != nil {
-			// tag do not exists create a new tag
-			savedTag, err := bg.tagApp.Save(tag)
+	for _, t := range tags {
+		ta, err := bg.tagApp.GetTagByName(t.Name)
+		if err != nil {
+			logrus.Warn("internal server error : " + err.Error())
+		}
+		if ta == nil { // tag do not exists create a new tag
+
+			savedTag, err := bg.tagApp.Save(t)
 			if err != nil {
 				// TODO: create a retry background task OR push it into an event bus
+				logrus.Warn(fmt.Sprintf("Tag %s is not saved", t.Name))
 			}
 
 			// save the blog-tag mapping
@@ -101,6 +107,7 @@ func (bg *Blog) Save(w http.ResponseWriter, r *http.Request) {
 			err = bg.blogTagApp.Save(blogTagMapping)
 			if err != nil {
 				// TODO: Create retry event or PUsh it into an event bus
+				logrus.Warn(fmt.Sprintf("Blog-Tag relation is not saved"))
 			}
 		}
 	}
@@ -178,6 +185,7 @@ func (bg *Blog) GetBlogById(w http.ResponseWriter, r *http.Request) {
 	tags, err := bg.tagService.GetTagsByBlogId(blog.ID)
 	// TODO: Do not throw error if tag service is down
 	if err != nil {
+		logrus.Warn(err.Error())
 	}
 
 	blogResp := blogResponse{
