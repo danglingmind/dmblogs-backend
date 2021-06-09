@@ -88,10 +88,22 @@ func (t *TagRepo) GetTagByName(name string) (*entity.Tag, error) {
 }
 
 func (t *TagRepo) GetTagsByIds(ids []uint64) ([]entity.Tag, error) {
+	// gorm does not support the slice we have to prepare the IN statement
+	inStatement := "id IN ("
+	var params []interface{}
+	for idx, i := range ids {
+		params = append(params, i)
+		if idx != len(ids)-1 {
+			inStatement += "?,"
+		} else {
+			inStatement += "?"
+		}
+	}
+	inStatement += ")"
 	var tags []entity.Tag
 	err := t.db.Debug().
 		Table("tags").
-		Where("id IN ?", ids).
+		Where(inStatement, params...).
 		Find(&tags).
 		Error
 	return tags, err

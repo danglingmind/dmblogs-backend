@@ -23,7 +23,7 @@ func (bt *BlogTagRepo) Save(blogTag entity.BlogTag) error {
 		return err
 	}
 	return bt.db.Debug().
-		Table("blogtag").
+		Table("blogtags").
 		Create(&blogTag).
 		Error
 }
@@ -37,7 +37,8 @@ func (bt *BlogTagRepo) Delete(id uint64) error {
 func (bt *BlogTagRepo) DeleteByBlogId(ids []uint64) error {
 	return bt.db.
 		Debug().
-		Where("blogid IN ?", ids).
+		Table("blogtags").
+		Where("blog_id IN ?", ids).
 		Delete(entity.BlogTag{}).
 		Error
 }
@@ -45,7 +46,8 @@ func (bt *BlogTagRepo) DeleteByBlogId(ids []uint64) error {
 func (bt *BlogTagRepo) DeleteByTagId(ids []uint64) error {
 	return bt.db.
 		Debug().
-		Where("tagid IN ?", ids).
+		Table("blogtags").
+		Where("tag_id IN ?", ids).
 		Delete(entity.BlogTag{}).
 		Error
 }
@@ -53,8 +55,8 @@ func (bt *BlogTagRepo) DeleteByTagId(ids []uint64) error {
 func (bt *BlogTagRepo) GetByBlogId(id uint64) ([]entity.BlogTag, error) {
 	var blogtags []entity.BlogTag
 	err := bt.db.Debug().
-		Table("blogtag").
-		Where("blogid = ?", id).
+		Table("blogtags").
+		Where("blog_id = ?", id).
 		Find(&blogtags).
 		Error
 	if err != nil {
@@ -66,8 +68,8 @@ func (bt *BlogTagRepo) GetByBlogId(id uint64) ([]entity.BlogTag, error) {
 func (bt *BlogTagRepo) GetByTagId(id uint64) ([]entity.BlogTag, error) {
 	var blogtags []entity.BlogTag
 	err := bt.db.Debug().
-		Table("blogtag").
-		Where("tagid = ?", id).
+		Table("blogtags").
+		Where("tag_id = ?", id).
 		Find(&blogtags).
 		Error
 	if err != nil {

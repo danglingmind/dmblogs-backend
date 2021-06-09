@@ -90,8 +90,7 @@ func (bg *Blog) Save(w http.ResponseWriter, r *http.Request) {
 	for _, t := range tags {
 		ta, err := bg.tagApp.GetTagByName(t.Name)
 		if err != nil {
-			Error(w, http.StatusInternalServerError, err, "internal server error : tag service")
-			return
+			logrus.Warn("internal server error : " + err.Error())
 		}
 		if ta == nil { // tag do not exists create a new tag
 
@@ -186,6 +185,7 @@ func (bg *Blog) GetBlogById(w http.ResponseWriter, r *http.Request) {
 	tags, err := bg.tagService.GetTagsByBlogId(blog.ID)
 	// TODO: Do not throw error if tag service is down
 	if err != nil {
+		logrus.Warn(err.Error())
 	}
 
 	blogResp := blogResponse{
