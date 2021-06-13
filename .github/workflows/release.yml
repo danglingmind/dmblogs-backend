@@ -18,11 +18,16 @@ jobs:
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USER }} 
             -p ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build Docker images
+      - name: Build Service Docker images
         run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} -f Dockerfile.backend .
+
+      - name: Build Postgres Docker images
         run: docker build -t $DB_REPO:latest -t $DB_REPO:${GITHUB_SHA::8} -f Dockerfile.postgres .
-      - name: Publish Docker images
+
+      - name: Publish Backend Docker images
         run: docker push $REPO
+        
+      - name: Publish Postgres Docker images
         run: docker push $DB_REPO
 
   redeploy:
