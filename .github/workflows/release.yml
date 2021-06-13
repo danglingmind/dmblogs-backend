@@ -13,10 +13,10 @@ jobs:
       REPO: ${{ secrets.DOCKER_REPO }}
       DB_REPO: ${{ secrets.DOCKER_REPO }}
     steps:
-      - uses: actions/download-artifacts@v2
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USER }} 
             -p ${{ secrets.DOCKER_PASSWORD }}
+            
       - name: Build Service Docker images
         run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} -f Dockerfile.backend .
 
