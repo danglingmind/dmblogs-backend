@@ -6,6 +6,7 @@ on:
       - 'release-*'
 
 jobs:
+  
   docker:
     name: Publish - Docker Hub
     runs-on: ubuntu-18.04
@@ -13,6 +14,7 @@ jobs:
       REPO: ${{ secrets.DOCKER_REPO }}
       DB_REPO: ${{ secrets.DOCKER_REPO }}
     steps:
+      - uses: actions/checkout@v2
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
