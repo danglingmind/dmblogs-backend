@@ -41,6 +41,8 @@ services:
         depends_on: 
             - redis 
             - postgres
+        restart_policy:
+            condition: on-failure
 
 volumes:
     db-data:
