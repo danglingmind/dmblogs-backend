@@ -9,13 +9,14 @@ import (
 	"danglingmind.com/ddd/infrastructure/persistence"
 	"danglingmind.com/ddd/interfaces"
 	"danglingmind.com/ddd/interfaces/middleware"
+	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
 
 	// initialize configurations
-	// godotenv.Load()
+	godotenv.Load()
 	// initialize the log
 	logInstance := logrus.New()
 	logInstance.SetFormatter(&logrus.JSONFormatter{})
