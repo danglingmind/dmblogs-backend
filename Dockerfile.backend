@@ -2,10 +2,9 @@ FROM golang:latest as base
 
 WORKDIR /app
 
-COPY go.* ./
+COPY . /app 
 RUN go mod tidy
 RUN go mod vendor
-COPY . /app 
 
 FROM base as build 
 RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -mod=vendor -a -o dmblogs-backend .
