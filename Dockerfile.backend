@@ -3,13 +3,12 @@ FROM golang:latest as base
 WORKDIR /app
 
 COPY go.* ./
-RUN go mod download
+RUN go mod tidy
 RUN go mod vendor
 COPY . /app 
 
 FROM base as build 
-RUN go build -o dmblogs-backend .
-
+RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -mod=vendor -a -o dmblogs-backend .
 
 FROM base as unit-test
 RUN go test -v ./...
