@@ -97,6 +97,7 @@ jobs:
       backend:
         # Docker Hub image
         image: deepak11627/blog
+        name: backend
         #
         ports:
           # Opens tcp port 6379 on the host and service container
@@ -128,9 +129,9 @@ jobs:
 
       - name: Run Integration tests
         run: |
-          docker ps
+          docker ps -a
           sleep 10
-          docker logs backend
+          docker logs -t backend
           make test.integration
 
   Tag:
