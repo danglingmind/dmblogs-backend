@@ -1,0 +1,23 @@
+FROM golang:latest as base
+
+WORKDIR /app
+
+ENV CGO_ENABLED=0
+
+COPY go.* ./
+RUN go mod vendor
+COPY . /app 
+
+FROM base as build 
+RUN go build -o dmblogs-backend .
+
+
+FROM base as unit-test
+RUN go test -v ./...
+
+FROM alpine:latest
+COPY --from=build /app/dmblogs-backend .
+
+EXPOSE 8000:8000
+
+CMD [ "./dmblogs-backend" ]
