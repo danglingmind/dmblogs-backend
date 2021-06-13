@@ -5,6 +5,7 @@ WORKDIR /app
 ENV CGO_ENABLED=0
 
 COPY go.* ./
+RUN go mod download
 RUN go mod vendor
 COPY . /app 
 
