@@ -97,7 +97,7 @@ jobs:
       backend:
         # Docker Hub image
         image: deepak11627/blog
-        name: backend
+        container_name: backend
         #
         ports:
           # Opens tcp port 6379 on the host and service container
