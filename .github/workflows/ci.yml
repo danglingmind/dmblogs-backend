@@ -38,31 +38,100 @@ jobs:
           name: dmblogs
           path: dmblogs
 
-  Integration-Test:
+  Push-To-Docker-Registry:
+    name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     needs: Build
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out the repo
+        uses: actions/checkout@v2
 
       - name: Download application binary
         uses: actions/download-artifact@v2
         with:
           name: dmblogs
+        
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: deepak11627
+          password: Google123#
 
-      - name: Change permission for dmblogs
-        run: chmod 755 dmblogs
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: deepak11627/blog:latest
 
-      - name: Setup Integration test environment
-        run: make docker.start.components
-          
-      - name: Run integration tests
+  Integration-Test:
+    runs-on: ubuntu-latest
+    needs: Push-To-Docker-Registry
+    # Service containers to run with `runner-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: 'ricky2327'
+          POSTGRES_USER: 'danglingmind'
+          POSTGRES_DB: 'blogapp'
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+        # Label used to access the service container
+      redis:
+        # Docker Hub image
+        image: redis
+        #
+        ports:
+          # Opens tcp port 6379 on the host and service container
+          - 6379:6379
+      backend:
+        # Docker Hub image
+        image: deepak11627/blog
+        #
+        ports:
+          # Opens tcp port 6379 on the host and service container
+          - 8000:8000
+        env:
+          #Postgres
+          DB_HOST: localhost
+          DB_DRIVER: postgres
+          DB_USER: danglingmind
+          DB_PASSWORD: '#ricky2327'
+          DB_NAME: blogapp
+          DB_PORT: 5432
+
+          ACCESS_SECRET: 98hbun98h
+          REFRESH_SECRET: 786dfdbjhsb
+
+          #Redis
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
+
+          #server
+          PORT: 8000
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create database tables
+        run: psql -f ./create-tables-postgres.sql postgresql://danglingmind:ricky2327@localhost:5432/blogapp
+
+
+      - name: Run Integration tests
         run: |
           docker ps
-          docker logs dmblogs-backend
+          sleep 10
+          docker logs backend
           make test.integration
-      
-      - name: Teardown Integration test environment
-        run: make docker.stop
 
   Tag:
     if: ${{ github.event_name == 'push' }}
@@ -79,28 +148,7 @@ jobs:
           ./generate-tag.sh
           echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
 
-  Push-To-Docker-Registry:
-    if: ${{ github.event_name == 'push' }}
-    name: Push Docker image to Docker Hub
-    runs-on: ubuntu-latest
-    needs: Tag
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
 
-      - name: Download application binary
-        uses: actions/download-artifact@v2
-        with:
-          name: dmblogs
-        
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push to Docker Hub
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: danglingmind/dmblog-go-backend:v${{ needs.Tag.outputs.tag_name }}
+
+
