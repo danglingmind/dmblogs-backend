@@ -58,8 +58,8 @@ jobs:
       - name: Run integration tests
         run: |
           docker ps -a
-          sleep 5
-          docker logs dmblogs-backend
+          docker logs dmblogs-backend   
+          sleep 10
           make test.integration
       
       - name: Teardown Integration test environment
