@@ -3,18 +3,6 @@ FROM golang:latest as base
 WORKDIR /app
 
 ENV CGO_ENABLED=0
-ENV PORT=8000
-ENV ACCESS_SECRET=98hbun98h
-ENV REFRESH_SECRET=786dfdbjhsb
-ENV REDIS_HOST=redis
-ENV REDIS_PORT=6379
-ENV REDIS_PASSWORD=
-ENV DB_HOST=postgres
-ENV DB_DRIVER="postgres"
-ENV DB_USER=danglingmind
-ENV DB_PASSWORD='#ricky2327'
-ENV DB_NAME=blogapp
-ENV DB_PORT=5432
 
 COPY go.* ./
 RUN go mod vendor
@@ -29,6 +17,25 @@ RUN go test -v ./...
 
 FROM alpine:latest
 COPY --from=build /app/dmblogs-backend .
+
+#server
+ENV PORT=8000
+ENV ACCESS_SECRET=98hbun98h
+ENV REFRESH_SECRET=786dfdbjhsb
+
+ENV DB_DRIVER=postgres
+ENV DB_HOST=postgres
+ENV DB_DRIVER=postgres
+ENV DB_USER=danglingmind
+ENV DB_PASSWORD='#ricky2327'
+ENV DB_NAME=blogapp
+ENV DB_PORT=5432
+
+#Redis
+ENV REDIS_HOST=redis
+ENV REDIS_PORT=6379
+ENV REDIS_PASSWORD=
+
 EXPOSE 8000:8000
 
 CMD [ "./dmblogs-backend" ]
