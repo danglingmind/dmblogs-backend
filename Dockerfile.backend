@@ -18,11 +18,12 @@ RUN go test -v ./...
 FROM alpine:latest
 COPY --from=build /app/dmblogs-backend .
 
+# Env variables
 #server
 ENV PORT=8000
 ENV ACCESS_SECRET=98hbun98h
 ENV REFRESH_SECRET=786dfdbjhsb
-
+#db
 ENV DB_DRIVER=postgres
 ENV DB_HOST=postgres
 ENV DB_DRIVER=postgres
@@ -30,7 +31,6 @@ ENV DB_USER=danglingmind
 ENV DB_PASSWORD='#ricky2327'
 ENV DB_NAME=blogapp
 ENV DB_PORT=5432
-
 #Redis
 ENV REDIS_HOST=redis
 ENV REDIS_PORT=6379
