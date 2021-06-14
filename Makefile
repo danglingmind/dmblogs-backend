@@ -11,11 +11,11 @@ INTEGRATION_TEST_PATH?=./integration-tests
 
 # this command will start a docker components that we set in docker-compose.yml
 docker.start.components:
-	docker-compose up -d;
+	docker-compose up -f docker-compose-local.yml -d;
 
 # shutting down docker components
 docker.stop:
-	docker-compose down;
+	docker-compose -f docker-compose-local.yml down;
 
 # this command will trigger integration test
 # INTEGRATION_TEST_SUITE_PATH is used for run specific test in Golang, if it's not specified
