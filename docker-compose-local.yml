@@ -16,7 +16,7 @@ services:
         volumes: 
             - db-data:/var/lib/postres/data
             # copy table creation scripts
-            - ./create-tables-postgres.sql:/docker-entrypoint-initdb.d/create_tables.sql
+            - ./db/create-tables-postgres.sql:/docker-entrypoint-initdb.d/create_tables.sql
         networks: 
             - overlay
 
