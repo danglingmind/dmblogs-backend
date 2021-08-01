@@ -66,24 +66,49 @@ func main() {
 
 	// Initialize server
 	server := interfaces.NewServer()
+
+	// add api prefix to all api endpoints
+	apiSubrouter := server.Router.PathPrefix("/api/").Subrouter()
 	// CORS middleware
-	server.Router.Use(middleware.CORSMiddleware)
+	apiSubrouter.Use(middleware.CORSMiddleware)
 	// logging middleware
-	server.Router.Use(logMiddleware)
+	apiSubrouter.Use(logMiddleware)
+
 	// login service endpoints
-	server.AddRoute("PUT", "/users/register", authenticator.Register)
-	server.AddRoute("POST", "/users/login", authenticator.Login)
+	apiSubrouter.
+		Path("/users/register").
+		Methods("PUT").
+		HandlerFunc(authenticator.Register)
+
+	apiSubrouter.
+		Path("/users/login").
+		Methods("POST").
+		HandlerFunc(authenticator.Login)
 
 	// add authentication to login routes
-	authenticatedRouter := server.Router.PathPrefix("/auth/").Subrouter()
+	authenticatedRouter := apiSubrouter.PathPrefix("/auth/").Subrouter()
 	authenticatedRouter.Use(middleware.AuthMiddleware)
 
-	authenticatedRouter.HandleFunc("/logout", authenticator.Logout).Methods("POST")
-	// authenticatedRouter.HandleFunc("/refresh", authenticator.Refresh).Methods("POST")
+	authenticatedRouter.
+		Path("/logout").
+		Methods("POST").
+		HandlerFunc(authenticator.Logout)
+
+	authenticatedRouter.
+		Path("/refresh").
+		Methods("POST").
+		HandlerFunc(authenticator.Refresh)
 
 	// user service endpoints
-	server.AddRoute("GET", "/users", usersHandlers.GetAllUsers)
-	server.AddRoute("GET", "/users/{id}", usersHandlers.GetUserById)
+	apiSubrouter.
+		Path("/users").
+		Methods("GET").
+		HandlerFunc(usersHandlers.GetAllUsers)
+
+	apiSubrouter.
+		Path("/users/{id}").
+		Methods("GET").
+		HandlerFunc(usersHandlers.GetUserById)
 
 	// blogs endpoints
 	authenticatedRouter.
